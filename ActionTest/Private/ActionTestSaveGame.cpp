@@ -2,27 +2,30 @@
 
 #include "ActionTestSaveGame.h"
 
-void UActionTestSaveGame::SetRecord(float Time, FString Name, int32 index)
+UActionTestSaveGame::UActionTestSaveGame()
 {
+}
 
-	if (!Records.IsValidIndex(index))
+void UActionTestSaveGame::SaveData(float Time, FString Name, int32 index)
+{
+	if (!Records.IsValidIndex(index) && !Names.IsValidIndex(index))
 	{
 		Records.SetNum(index + 1);
-	}
-	if (!Names.IsValidIndex(index))
-	{
 		Names.SetNum(index + 1);
 	}
 
-	if (Names.IsValidIndex(index) || Records.IsValidIndex(index))
+	if (Records.IsValidIndex(index) && Names.IsValidIndex(index))
 	{
 		Records[index] = Time;
 		Names[index] = Name;
 	}
 }
 
-void UActionTestSaveGame::GetRecord(float & Time, FString & Name, int32 index)
+void UActionTestSaveGame::GetData(float & Time, FString & Name, int32 index)
 {
-	Time = Records[index];
-	Name = Names[index];
+	if (Records.IsValidIndex(index) && Names.IsValidIndex(index))
+	{
+		Time = Records[index];
+		Name = Names[index];
+	}
 }
