@@ -2,11 +2,7 @@
 
 #include "ActionTestSaveGame.h"
 
-UActionTestSaveGame::UActionTestSaveGame()
-{
-}
-
-void UActionTestSaveGame::SaveData(float Time, FString Name, int32 index)
+void UActionTestSaveGame::SetRecord(float Time, FString Name, int32 index)
 {
 	if (!Records.IsValidIndex(index) && !Names.IsValidIndex(index))
 	{
@@ -21,7 +17,7 @@ void UActionTestSaveGame::SaveData(float Time, FString Name, int32 index)
 	}
 }
 
-void UActionTestSaveGame::GetData(float & Time, FString & Name, int32 index)
+void UActionTestSaveGame::GetRecord(float & Time, FString & Name, int32 index)
 {
 	if (Records.IsValidIndex(index) && Names.IsValidIndex(index))
 	{

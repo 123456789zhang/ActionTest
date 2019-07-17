@@ -20,7 +20,7 @@ void AStreetSectionLevelScriptActor::BeginPlay()
 		Times.Add(FMath::FRandRange(39, 50));
 	}
 
-	UActionTestBlueprintLibrary::SortHighscores(Names, Times, Times, Names, 10);
+	UActionTestBlueprintLibrary::SortHighscores( Times, Names, Times, Names, 10);
 
 	Save = UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlatformerSave")),0);
 
