@@ -18,6 +18,11 @@ public:
 
 	UActionTestBlueprintLibrary();
 
+
+	/** 隐藏之前显示的图片 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void HidePicture(class UObject* WorldContextObject, float FadeOutTime = 0.3f);
+
 	/* 
 	 *	分数排序
 	 *

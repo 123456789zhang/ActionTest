@@ -32,6 +32,11 @@ public:
 	/** 获取当前游戏的状态 */
 	EGameState::Type GetGameState() const;
 
+public:
+
+	/** 全屏图片信息 */
+	class FActionTestPicture* ActionTestPicture;
+
 private:
 
 	/** 当前正在进行中 */

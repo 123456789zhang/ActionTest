@@ -36,11 +36,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USaveGame* Save;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString CurrentName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float CurrentTiem;
+
 protected:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void UpdateSaveHiscores();
-
 
 private:
 

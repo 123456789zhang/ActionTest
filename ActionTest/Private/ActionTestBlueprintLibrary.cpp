@@ -1,9 +1,22 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ActionTestBlueprintLibrary.h"
+#include "Engine/Engine.h"
+#include "ActionTestGameMode.h"
+#include "Private/UI/Widgets/ActionTestPicture.h"
 
 UActionTestBlueprintLibrary::UActionTestBlueprintLibrary()
 {
+}
+
+void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, float FadeOutTime)
+{
+	UWorld* const MyWorld = GEngine->GetWorldFromContextObject(WorldContextObject);
+	AActionTestGameMode* const MyGameMode = MyWorld->GetAuthGameMode<AActionTestGameMode>();
+	if (MyGameMode && MyGameMode->ActionTestPicture)
+	{
+		MyGameMode->ActionTestPicture->Hide(FadeOutTime);
+	}
 }
 
 void UActionTestBlueprintLibrary::SortHighscores(TArray<float> InTimes, TArray<FString> InNames, TArray<float>& OutTimes, TArray<FString>& OutNames, int32 MaxScores)
