@@ -22,5 +22,13 @@ public:
 	/** 当游戏结束是点击OK时调用，而highscore名称提示符处于活动状态 */
 	UPROPERTY(BlueprintAssignable)
 		FOnHighscoreNameAccepted OnHighscoreNameAccepted;
+
+public:
+
+	/** 设置数据并显示高分 */
+	void ShowHighscore(TArray<float> Times, TArray<FString> Names);
+
+	/** 隐藏积分榜 */
+	void HideHighscore();
 	
 };

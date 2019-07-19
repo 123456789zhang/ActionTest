@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "ActionTestGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundFinishedDelegate);
 
 namespace EGameState
 {
@@ -29,13 +30,22 @@ class ACTIONTEST_API AActionTestGameMode : public AGameModeBase
 
 public:
 
-	/** 获取当前游戏的状态 */
-	EGameState::Type GetGameState() const;
 
-public:
+	/** 委派广播游戏的结束 */
+	UPROPERTY(BlueprintAssignable)
+		FRoundFinishedDelegate OnRoundFinished;
 
 	/** 全屏图片信息 */
 	class FActionTestPicture* ActionTestPicture;
+
+public:
+
+	/** 获取当前游戏的状态 */
+	EGameState::Type GetGameState() const;
+
+	/** 设置是否可以重新开始游戏 */
+	void SetCanBeRestarted(bool bAllowRestart);
+
 
 private:
 

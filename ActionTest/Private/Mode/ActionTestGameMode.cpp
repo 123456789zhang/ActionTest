@@ -27,3 +27,7 @@ EGameState::Type AActionTestGameMode::GetGameState() const
 {
 	return GameState;
 }
+
+void AActionTestGameMode::SetCanBeRestarted(bool bAllowRestart)
+{
+}

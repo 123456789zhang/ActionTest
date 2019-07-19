@@ -23,6 +23,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
 		static void HidePicture(class UObject* WorldContextObject, float FadeOutTime = 0.3f);
 
+	/** 显示提供数据的最高分数 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void ShowHighscore(class UObject* WorldContextObject, TArray<float> Times, TArray<FString> Names);
+
+	/** 隐藏最高分数榜 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void HideHighscore(class UObject* WorldContextObject);
+
+	/** 允许玩家重新开始 */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
+		static void AllowToRestartRace(class UObject* WorldContextObject);
+
 	/* 
 	 *	分数排序
 	 *

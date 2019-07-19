@@ -4,9 +4,22 @@
 #include "Engine/Engine.h"
 #include "ActionTestGameMode.h"
 #include "Private/UI/Widgets/ActionTestPicture.h"
+#include "ActionTestHUD.h"
 
 UActionTestBlueprintLibrary::UActionTestBlueprintLibrary()
 {
+}
+
+AActionTestGameMode* GetGameFromContextObject(class UObject* WorldContextObject)
+{
+	UWorld* const MyWorld = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+	check(MyWorld);
+
+	UWorld* bbb = NULL;
+	check(bbb);
+
+	AActionTestGameMode* const MyGame = MyWorld->GetAuthGameMode<AActionTestGameMode>();
+	return MyGame;
 }
 
 void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, float FadeOutTime)
@@ -16,6 +29,35 @@ void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, floa
 	if (MyGameMode && MyGameMode->ActionTestPicture)
 	{
 		MyGameMode->ActionTestPicture->Hide(FadeOutTime);
+	}
+}
+
+void UActionTestBlueprintLibrary::ShowHighscore(UObject * WorldContextObject, TArray<float> Times, TArray<FString> Names)
+{
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject));
+	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
+	if (MyHUD)
+	{
+		MyHUD->ShowHighscore(Times,Names);
+	}
+}
+
+void UActionTestBlueprintLibrary::HideHighscore(UObject * WorldContextObject)
+{
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject));
+	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
+	if (MyHUD)
+	{
+		MyHUD->HideHighscore();
+	}
+}
+
+void UActionTestBlueprintLibrary::AllowToRestartRace(UObject * WorldContextObject)
+{
+	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		MyGame->SetCanBeRestarted(true);
 	}
 }
 
