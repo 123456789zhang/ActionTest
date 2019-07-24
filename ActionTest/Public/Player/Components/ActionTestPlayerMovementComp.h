@@ -26,5 +26,10 @@ public:
 
 	/** 停止移动和保存当前速度与窗台抓斗修改器 */
 	void PauseMovementForLedgeGrab();
+
+protected:
+
+	/** 自动移动 */
+	virtual FVector ScaleInputAcceleration(const FVector& InputAcceleration) const override;
 	
 };

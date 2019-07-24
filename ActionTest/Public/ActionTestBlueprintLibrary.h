@@ -18,6 +18,9 @@ public:
 
 	UActionTestBlueprintLibrary();
 
+	/** 切换到等待状态，玩家可以自己开始比赛 */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext="WorldContextObject"))
+		static void PrepareRace(class UObject* WorldContextObject);
 
 	/** 隐藏之前显示的图片 */
 	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))

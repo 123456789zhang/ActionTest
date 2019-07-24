@@ -11,6 +11,9 @@ APlayerPawn::APlayerPawn()
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		StaticMesh(TEXT("SkeletalMesh'/Game/Character/Skel_Mesh/Character_SkelMesh.Character_SkelMesh'"));
 
+	ConstructorHelpers::FClassFinder<UAnimInstance>
+		StaticAnim(TEXT("AnimBlueprint'/Game/Character/Anims/PlayerAnim.PlayerAnim_C'"));
+
 	
 	CrouchedEyeHeight = 64.0f;
 	BaseEyeHeight = 128.0f;
@@ -26,6 +29,9 @@ APlayerPawn::APlayerPawn()
 	if(StaticMesh.Object != nullptr)
 		GetMesh()->SetSkeletalMesh(StaticMesh.Object);
 
+	if (StaticAnim.Class != nullptr)
+		GetMesh()->AnimClass = StaticAnim.Class;
+
 	UActionTestPlayerMovementComp* MoveComp = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
 	
 	MoveComp->MaxAcceleration = 640.0f;
@@ -33,7 +39,7 @@ APlayerPawn::APlayerPawn()
 	MoveComp->Mass = 200.0f;
 
 	MoveComp->MaxWalkSpeed = 1500.0f;
-	MoveComp->MinAnalogWalkSpeed = 1500.0f;
+	MoveComp->MaxWalkSpeedCrouched = 1500.0f;
 	MoveComp->BrakingDecelerationWalking = 512.0f;
 
 	MoveComp->JumpZVelocity = 1050.0f;

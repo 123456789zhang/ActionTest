@@ -40,16 +40,30 @@ public:
 
 public:
 
+	/** 准备游戏状态并显示HUD信息 */
+	void PrepareRound(bool bRestarting = false);
+
 	/** 获取当前游戏的状态 */
 	EGameState::Type GetGameState() const;
 
 	/** 设置是否可以重新开始游戏 */
 	void SetCanBeRestarted(bool bAllowRestart);
 
+	/** 如果回合正在进行中，返回true——玩家仍在移动 */
+	bool IsRoundInProgress() const;
+
+	/** 开始这一轮游戏 */
+	void StartRound();
 
 private:
 
 	/** 当前正在进行中 */
 	EGameState::Type GameState;
+	
+	/** 如果玩家赢了这一轮，为真，否则为假 */
+	uint32 bRoundWasWon : 1;
+
+	/** 玩家开始这一轮的时间 */
+	float RoundStartTime;
 	
 };

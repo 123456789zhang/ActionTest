@@ -18,6 +18,7 @@ public:
 
 	AActionTestPlayerController();
 
+	/** Ё╒йт©╙й╪сно╥ */
 	bool TryStartingGame();
 	
 };

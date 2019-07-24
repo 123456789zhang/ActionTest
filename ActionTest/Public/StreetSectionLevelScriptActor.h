@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
+#include "Components/TimelineComponent.h"
 #include "StreetSectionLevelScriptActor.generated.h"
 
 
@@ -20,9 +21,9 @@ public:
 
 	AStreetSectionLevelScriptActor();
 
-
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime)override;
 
 
 public:
@@ -42,15 +43,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float CurrentTiem;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Hidden;
+
+	UPROPERTY()
+		class UCurveFloat* FloatCurve;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		class UTimelineComponent* TimelineComponent;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+
+	UPROPERTY()
+		float CurveFloat;
+
 protected:
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateSaveHiscores();
 
+	UFUNCTION(BlueprintNativeEvent)
+		void TimelineCallback(float val);
+
+	UFUNCTION()
+		void TimelineFinishedCallback();
+
 private:
 
 	template<typename T>
 	void SetArrayElem(TArray<T> Array, int32 index, T Item);
+
 
 };
 

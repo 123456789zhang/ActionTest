@@ -167,7 +167,7 @@ void AActionTestCharacter::OnStartJump()
 		}
 
 		if (!MyPC->IsMoveInputIgnored() &&
-			MyGame && MyGame)
+			MyGame && MyGame->IsRoundInProgress())
 		{
 			bPressedJump = true;
 		}
@@ -176,6 +176,7 @@ void AActionTestCharacter::OnStartJump()
 
 void AActionTestCharacter::OnStopJump()
 {
+	StopJumping();
 }
 
 void AActionTestCharacter::OnStartSlide()

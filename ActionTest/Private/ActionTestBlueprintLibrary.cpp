@@ -15,11 +15,17 @@ AActionTestGameMode* GetGameFromContextObject(class UObject* WorldContextObject)
 	UWorld* const MyWorld = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
 	check(MyWorld);
 
-	UWorld* bbb = NULL;
-	check(bbb);
-
 	AActionTestGameMode* const MyGame = MyWorld->GetAuthGameMode<AActionTestGameMode>();
 	return MyGame;
+}
+
+void UActionTestBlueprintLibrary::PrepareRace(UObject * WorldContextObject)
+{
+	AActionTestGameMode* const MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		MyGame->PrepareRound();
+	}
 }
 
 void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, float FadeOutTime)

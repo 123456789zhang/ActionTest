@@ -2,6 +2,8 @@
 
 #include "ActionTestPlayerController.h"
 #include "ActionTestPlayerCameraManager.h"
+#include "ActionTestGameMode.h"
+#include "Engine/Engine.h"
 
 AActionTestPlayerController::AActionTestPlayerController()
 {
@@ -12,5 +14,20 @@ AActionTestPlayerController::AActionTestPlayerController()
 
 bool AActionTestPlayerController::TryStartingGame()
 {
+	AActionTestGameMode* MyGame = GetWorld()->GetAuthGameMode<AActionTestGameMode>();
+	if (MyGame)
+	{
+		const EGameState::Type GameState = MyGame->GetGameState();
+		switch (GameState)
+		{
+			case EGameState::Waiting:
+				MyGame->StartRound();
+				return true;
+
+			case EGameState::Finished:
+
+				return true;
+		}
+	}
 	return false;
 }
