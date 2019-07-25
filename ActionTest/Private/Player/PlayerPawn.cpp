@@ -34,18 +34,27 @@ APlayerPawn::APlayerPawn()
 
 	UActionTestPlayerMovementComp* MoveComp = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
 	
+	//Jumping/Falling
+	MoveComp->JumpZVelocity = 1050.f;
+	MoveComp->AirControl = 1.0f;
+
+	//Character Movement
 	MoveComp->MaxAcceleration = 640.0f;
 	MoveComp->CrouchedHalfHeight = 80.0f;
 	MoveComp->Mass = 200.0f;
 
+	//Walking
 	MoveComp->MaxWalkSpeed = 1500.0f;
 	MoveComp->MaxWalkSpeedCrouched = 1500.0f;
 	MoveComp->BrakingDecelerationWalking = 512.0f;
 
-	MoveComp->JumpZVelocity = 1050.0f;
-	MoveComp->AirControl = 1.0f;
-
+	//Custom Movement
 	MoveComp->MaxCustomMovementSpeed = 1500.0f;
 
-	MoveComp->NavAgentProps = FNavAgentProperties(68.0f,352.0f);
+	//Nav Movement
+	FNavAgentProperties  NavAgentProperties=  FNavAgentProperties(68.0f, 352.0f);
+	NavAgentProperties.bCanJump = true;
+	NavAgentProperties.bCanWalk = true;
+	NavAgentProperties.bCanSwim = true;
+	MoveComp->NavAgentProps = NavAgentProperties;
 }

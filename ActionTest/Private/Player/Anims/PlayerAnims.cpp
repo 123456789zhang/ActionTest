@@ -4,6 +4,7 @@
 #include "ActionTestCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ActionTest.h"
+#include "Engine/Engine.h"
 
 UPlayerAnims::UPlayerAnims()
 {
@@ -27,13 +28,13 @@ void UPlayerAnims::NativeUpdateAnimation(float DeltaSeconds)
 
 	Speed = FMath::Abs(DotVelocity);
 
-	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMovementMode"), true);
+	//const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMovementMode"), true);
 
-	if (EnumPtr)
-	{
-		FName EnumName=EnumPtr->GetNameByValue((int64)(Character->GetCharacterMovement()->MovementMode.GetValue()));
-		UE_LOG(LogActionTest, Log, TEXT("MovementMode：%s"), *EnumName.ToString());
-	}
+	//if (EnumPtr)
+	//{
+	//	FName EnumName=EnumPtr->GetNameByValue((int64)(Character->GetCharacterMovement()->MovementMode.GetValue()));
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("MovementMode:%s"), *EnumName.ToString()));
+	//}
 
 	bInAir = Character->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling;
 
