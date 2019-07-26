@@ -34,6 +34,9 @@ APlayerPawn::APlayerPawn()
 
 	UActionTestPlayerMovementComp* MoveComp = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
 	
+	MoveComp->SetMinSlideSpeed(400.0f);
+	MoveComp->SetSlideHeight(135.0f);
+
 	//Jumping/Falling
 	MoveComp->JumpZVelocity = 1050.f;
 	MoveComp->AirControl = 1.0f;

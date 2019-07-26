@@ -3,15 +3,22 @@
 #include "ActionTestPlayerMovementComp.h"
 #include "ActionTestGameMode.h"
 #include "Engine/Engine.h"
+#include "ActionTestCharacter.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 UActionTestPlayerMovementComp::UActionTestPlayerMovementComp()
 {
+	MinSlideSpeed = 200.f;
+	SlideHeight = 60.0f;
 
+	SlideMeshRelativeLocationOffset = FVector(0.0f, 0.0f, 34.0f);
+	bWantsSlideMeshRelativeLocationOffset = true;
 }
 
 bool UActionTestPlayerMovementComp::IsSliding() const
 {
-	return false;
+	return bInSlide;
 }
 
 void UActionTestPlayerMovementComp::TryToEndSlide()
@@ -20,6 +27,41 @@ void UActionTestPlayerMovementComp::TryToEndSlide()
 
 void UActionTestPlayerMovementComp::PauseMovementForLedgeGrab()
 {
+}
+
+void UActionTestPlayerMovementComp::SetMinSlideSpeed(float minSlideSpeed)
+{
+	MinSlideSpeed = minSlideSpeed;
+}
+
+void UActionTestPlayerMovementComp::SetSlideHeight(float slideHeight)
+{
+	SlideHeight = slideHeight;
+}
+
+void UActionTestPlayerMovementComp::PhysWalking(float deltaTime, int32 Iterations)
+{
+	AActionTestCharacter* MyPawn = Cast<AActionTestCharacter>(PawnOwner);
+
+	if (MyPawn)
+	{
+		const bool bWantsToSlide = MyPawn->WantsToSlide();
+		if (IsSliding())//玩家滑动结束
+		{
+			
+			const float CurrentSpeedSq = Velocity.SizeSquared();
+		}
+		else if (bWantsToSlide)//玩家滑动
+		{
+			if (!IsFlying() &&
+				Velocity.SizeSquared() > FMath::Square(MinSlideSpeed * 2.0f))//确保玩家有一定的速度
+			{
+				StartSlide();
+			}
+		}
+	}
+
+	Super::PhysWalking(deltaTime, Iterations);
 }
 
 FVector UActionTestPlayerMovementComp::ScaleInputAcceleration(const FVector & InputAcceleration) const
@@ -33,4 +75,46 @@ FVector UActionTestPlayerMovementComp::ScaleInputAcceleration(const FVector & In
 	}
 
 	return Super::ScaleInputAcceleration(NewAccel);
+}
+
+void UActionTestPlayerMovementComp::StartSlide()
+{
+	if (!bInSlide)
+	{
+		bInSlide = true;
+		CurrentSlideVelocityReduction = 0;
+		SetSlideCollisionHeight();
+	
+		AActionTestCharacter* MyOwner = Cast<AActionTestCharacter>(PawnOwner);
+		if (MyOwner)
+		{
+			//播放滑动音乐
+			MyOwner;
+		}
+	}
+}
+
+void UActionTestPlayerMovementComp::SetSlideCollisionHeight()
+{
+	if (!CharacterOwner || SlideHeight <= 0.0f)
+	{
+		return;
+	}
+
+	//如果碰撞已经在期望的大小，则不执行。
+	if (CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() == SlideHeight)
+	{
+		return;
+	}
+
+	//碰撞大小更改为新值
+	CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleRadius(),SlideHeight);
+
+	//应用修正PawnOwner网相对位置
+	if (bWantsSlideMeshRelativeLocationOffset)
+	{
+		ACharacter* DefCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+		const FVector Correction = DefCharacter->GetMesh()->RelativeLocation + SlideMeshRelativeLocationOffset;
+		CharacterOwner->GetMesh()->SetRelativeLocation(Correction);
+	}
 }

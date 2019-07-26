@@ -181,10 +181,26 @@ void AActionTestCharacter::OnStopJump()
 
 void AActionTestCharacter::OnStartSlide()
 {
+	AActionTestGameMode* MyGame = GetWorld()->GetAuthGameMode<AActionTestGameMode>();
+	AActionTestPlayerController* MyPC = Cast<AActionTestPlayerController>(Controller);
+	if (MyPC)
+	{
+		if (MyPC->TryStartingGame())
+		{
+			return;
+		}
+
+		if (!MyPC->IsMoveInputIgnored() &&
+			MyGame&& MyGame->IsRoundInProgress())
+		{
+			bPressedSlide = true;
+		}
+	}
 }
 
 void AActionTestCharacter::OnStopSlide()
 {
+	bPressedSlide = false;
 }
 
 void AActionTestCharacter::ClimbOverObstacle()
