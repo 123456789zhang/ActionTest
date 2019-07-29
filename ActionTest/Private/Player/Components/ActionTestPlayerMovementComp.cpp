@@ -23,6 +23,11 @@ bool UActionTestPlayerMovementComp::IsSliding() const
 
 void UActionTestPlayerMovementComp::TryToEndSlide()
 {
+	//如果允许碰撞，结束滑动
+	if (bInSlide)
+	{
+		
+	}
 }
 
 void UActionTestPlayerMovementComp::PauseMovementForLedgeGrab()
@@ -50,6 +55,11 @@ void UActionTestPlayerMovementComp::PhysWalking(float deltaTime, int32 Iteration
 		{
 			
 			const float CurrentSpeedSq = Velocity.SizeSquared();
+			if (CurrentSpeedSq <= FMath::Square(MinSlideSpeed))
+			{
+				//滑动最小速度,试图结束它
+				TryToEndSlide();
+			}
 		}
 		else if (bWantsToSlide)//玩家滑动
 		{
