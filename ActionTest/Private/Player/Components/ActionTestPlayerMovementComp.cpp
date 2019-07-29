@@ -57,7 +57,7 @@ void UActionTestPlayerMovementComp::PhysWalking(float deltaTime, int32 Iteration
 			const float CurrentSpeedSq = Velocity.SizeSquared();
 			if (CurrentSpeedSq <= FMath::Square(MinSlideSpeed))
 			{
-				//滑动最小速度,试图结束它
+				//滑动最小值 - 尝试结束它
 				TryToEndSlide();
 			}
 		}
@@ -127,4 +127,48 @@ void UActionTestPlayerMovementComp::SetSlideCollisionHeight()
 		const FVector Correction = DefCharacter->GetMesh()->RelativeLocation + SlideMeshRelativeLocationOffset;
 		CharacterOwner->GetMesh()->SetRelativeLocation(Correction);
 	}
+}
+
+bool UActionTestPlayerMovementComp::RestoreCollisionHeightAfterSlide()
+{
+	if (!CharacterOwner || !UpdatedPrimitive)
+	{
+		return false;
+	}
+
+	ACharacter* DefCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+	const float DefHalfHeight = DefCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	const float DefRadius = DefCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+
+	//如果冲突已经达到所需的大小，则不要执行。
+	if (CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() == DefHalfHeight)
+	{
+		return false;
+	}
+
+	const float HeightAdjust = DefHalfHeight - CharacterOwner->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	const FVector NewLocation = CharacterOwner->GetActorLocation() + FVector(0.0f, 0.0f, HeightAdjust);
+
+	//检查是否有足够的空间容纳默认的胶囊大小
+	FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(FinishSlide), false, CharacterOwner);
+	FCollisionResponseParams ResponseParam;
+
+	InitCollisionParams(TraceParams, ResponseParam);
+	const bool bBlocked = GetWorld()->OverlapBlockingTestByChannel(NewLocation, FQuat::Identity, UpdatedPrimitive->GetCollisionObjectType(), FCollisionShape::MakeCapsule(DefRadius, DefHalfHeight), TraceParams);
+	if (bBlocked)
+	{
+		return false;
+	}
+
+	//恢复胶囊大小和移动到调整的位置
+	CharacterOwner->TeleportTo(NewLocation, CharacterOwner->GetActorRotation(), false, true);
+	CharacterOwner->GetCapsuleComponent()->SetCapsuleSize(DefRadius, DefHalfHeight);
+
+	//恢复原始PawnOwner网格的相对位置
+	if (bWantsSlideMeshRelativeLocationOffset)
+	{
+		CharacterOwner->GetMesh()->SetRelativeLocation(DefCharacter->GetMesh()->RelativeLocation);
+	}
+
+	return true;
 }

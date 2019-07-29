@@ -57,6 +57,12 @@ protected:
 	/** 改变滑动时玩家的高度调整玩家碰撞 */
 	void SetSlideCollisionHeight();
 
+	/**
+	 *	将滑动后的棋子高度恢复为默认值，如果棋子上方的碰撞允许的话
+	 *	如果高度更改成功，返回true，否则返回false
+	 */
+	bool RestoreCollisionHeightAfterSlide();
+
 private:
 
 	/** 当玩家按下滑动按钮是为true */
