@@ -35,6 +35,9 @@ public:
 
 public:
 
+	UPROPERTY(EditDefaultsOnly,Category = Config)
+	float MaxSlideSpeed;
+
 	/** 玩家最小速度可以滑动 */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 		float MinSlideSpeed;
@@ -42,6 +45,10 @@ public:
 	/** 滑动时玩家的高度 */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 		float SlideHeight;
+
+	/** 在滑行过程中降低速度的值 */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+		float SlideVelocityReduction;
 
 protected:
 
@@ -63,6 +70,12 @@ protected:
 	 */
 	bool RestoreCollisionHeightAfterSlide();
 
+	/** 当玩家在滑动时，计算当前滑动减少的新值 */
+	void CalcCurrentSlideVelocityReduction(float DeltaTime);
+
+	/** 计算出滑动的速度，这是滑动的新速度 */
+	void CalcSlideVelocity(FVector& OutVelocity) const;
+	
 private:
 
 	/** 当玩家按下滑动按钮是为true */
