@@ -46,6 +46,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		 UCurveFloat* FloatCurveTow;
 
+	UPROPERTY(EditAnywhere)
+		FVector Scale;
+
+	UPROPERTY(EditAnywhere)
+		FString TextToPrint;
+
 	UPROPERTY()
 		float OneCurveFloatValue;
 
@@ -53,13 +59,18 @@ public:
 		float TwoCurveFloatValue;
 
 	UPROPERTY(Transient)
-		bool TempBool;
+	bool TempBool;
 
-	UPROPERTY(Transinet)
-		bool TempBoolIsClosed;
+	UPROPERTY(Transient)
+	bool TempBoolTwo;
 
-	UPROPERTY(Transinet)
-		bool TempBoolGateOpenOrClose;
+	UPROPERTY(Transient)
+	bool TempBoolGateOpenOrClose;
+
+	UPROPERTY(Transient)
+	bool TempBoolGateOpenOrCloseTwo;
+
+	FTimerHandle TimeLineHandle;
 
 protected:
 
@@ -69,18 +80,24 @@ protected:
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UFUNCTION()
-	void OneTimelineCallback();
+	void OneTimelineCallback(float val);
 
 	UFUNCTION()
 	void OneTimelineFinishedCallback();
 
 	UFUNCTION()
-		void TwoTimelineCallback();
+	void TwoTimelineCallback(float val);
 
 	UFUNCTION()
-		void TwoTimelineFinishedCallback();
+	void TwoTimelineFinishedCallback();
 
-	void Gate(int32 value);
+	void GateOne(int32 value);
+
+	void GateTwo(int32 value);
 
 	void SequenceOne();
+
+	void SequenceTwo();
+
+	void OpenTimelineTwo();
 };

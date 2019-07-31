@@ -8,6 +8,9 @@
 #include "Curves/CurveFloat.h"
 #include "Curves/RichCurve.h"
 #include "Components/TimelineComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "TimerManager.h"
+
 
 
 ATextActor::ATextActor()
@@ -103,26 +106,34 @@ void ATextActor::BeginPlay()
 
 void ATextActor::OnComponentBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	Gate(1);
+	GateOne(1);
 }
 
-void ATextActor::OneTimelineCallback()
+void ATextActor::OneTimelineCallback(float val)
 {
+	FString Command = FString::Printf(TEXT("slomo %f"), val);
+	UKismetSystemLibrary::ExecuteConsoleCommand(this, Command);
+	Text->SetHiddenInGame(false, false);
 }
 
 void ATextActor::OneTimelineFinishedCallback()
 {
+	UKismetSystemLibrary::ExecuteConsoleCommand(this, FString(TEXT("slomo 0.1")));
+	GetWorldTimerManager().SetTimer(TimeLineHandle, this, &ATextActor::OpenTimelineTwo, 0.1f, false);
 }
 
-void ATextActor::TwoTimelineCallback()
+void ATextActor::TwoTimelineCallback(float val)
 {
+	FString Command = FString::Printf(TEXT("slomo %f"), val);
+	UKismetSystemLibrary::ExecuteConsoleCommand(this, Command);
 }
 
 void ATextActor::TwoTimelineFinishedCallback()
 {
+	UKismetSystemLibrary::ExecuteConsoleCommand(this, FString(TEXT("slomo 1")));
 }
 
-void ATextActor::Gate(int32 value)
+void ATextActor::GateOne(int32 value)
 {
 	int32 CurrentState = value;
 
@@ -178,13 +189,85 @@ void ATextActor::Gate(int32 value)
 	} while (CurrentState != -1);
 }
 
+void ATextActor::GateTwo(int32 value)
+{
+	int32 CurrentState = value;
+
+	do
+	{
+		switch (CurrentState)
+		{
+		case 1:
+		{
+			if (TempBoolTwo)
+			{
+				if (TempBoolGateOpenOrCloseTwo)
+				{
+					TempBoolTwo = false;
+				}
+				else
+				{
+					TempBoolTwo = true;
+				}
+			}
+
+			if (TempBoolTwo)
+			{
+				SequenceTwo();
+			}
+
+			CurrentState = -1;
+
+			break;
+		}
+
+		case 2:
+		{
+			CurrentState = 1;
+
+			TempBoolTwo = true;
+
+			break;
+		}
+
+		case 3:
+		{
+			CurrentState = 1;
+
+			TempBoolTwo = false;
+
+			break;
+		}
+		default:
+			break;
+		}
+
+	} while (CurrentState != -1);
+}
+
 void ATextActor::SequenceOne()
 {
+	GateTwo(2);
+
 	if (TimelineComponentOne != NULL)
 	{
 		TimelineComponentOne->Play();
 	}
 
-	Gate(3);
+	GateOne(3);
+}
+
+void ATextActor::SequenceTwo()
+{
+	Text->SetRelativeScale3D(Scale);
+
+	Text->SetText(TextToPrint);
+}
+
+void ATextActor::OpenTimelineTwo()
+{
+	Text->SetHiddenInGame(true);
+
+	TimelineComponentTwo->PlayFromStart();
 }
 
