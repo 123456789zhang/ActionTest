@@ -37,6 +37,9 @@ public:
 	/** 停止任何活动动画，重置移动状态 */
 	void OnRoundReset();
 
+	/** 滑动完成后处理效果 */
+	void PlaySlideFinished();
+
 	/** 当前玩家滑动时返回true;用于AnimBlueprint */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|Character")
 		bool IsSliding() const;

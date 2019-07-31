@@ -24,9 +24,18 @@ bool UActionTestPlayerMovementComp::IsSliding() const
 void UActionTestPlayerMovementComp::TryToEndSlide()
 {
 	//如果允许碰撞，结束滑动
-	if (bInSlide)
+	if (bInSlide)	
 	{
-		
+		if (RestoreCollisionHeightAfterSlide())
+		{
+			bInSlide = false;
+
+			AActionTestCharacter* MyOwner = Cast<AActionTestCharacter>(PawnOwner);
+			if (MyOwner)
+			{
+				MyOwner->PlaySlideFinished();
+			}
+		}
 	}
 }
 

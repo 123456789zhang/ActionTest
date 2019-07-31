@@ -139,6 +139,11 @@ void AActionTestCharacter::OnRoundReset()
 	bPressedSlide = false;
 }
 
+void AActionTestCharacter::PlaySlideFinished()
+{
+	//停止播放滑动的音乐
+}
+
 bool AActionTestCharacter::IsSliding() const
 {
 	UActionTestPlayerMovementComp* MoveComp = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
