@@ -45,6 +45,7 @@ void ATextActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	GateTwo(1);
 }
 
 void ATextActor::BeginPlay()
@@ -131,6 +132,8 @@ void ATextActor::TwoTimelineCallback(float val)
 void ATextActor::TwoTimelineFinishedCallback()
 {
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, FString(TEXT("slomo 1")));
+
+	GateTwo(3);
 }
 
 void ATextActor::GateOne(int32 value)
