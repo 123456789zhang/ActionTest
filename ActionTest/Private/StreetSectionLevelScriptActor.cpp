@@ -17,6 +17,7 @@ AStreetSectionLevelScriptActor::AStreetSectionLevelScriptActor()
 	FloatCurve = Curve.Object;
 
 	CurveFloat = 0.0f;
+
 }
 
 

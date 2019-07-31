@@ -6,11 +6,15 @@
 #include "ActionTestCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/WorldSettings.h"
 
 UActionTestPlayerMovementComp::UActionTestPlayerMovementComp()
 {
 	MinSlideSpeed = 200.f;
+	MaxSlideSpeed = MaxWalkSpeed + 200.0f;
 	SlideHeight = 60.0f;
+
+	SlideVelocityReduction = 30.0f;
 
 	SlideMeshRelativeLocationOffset = FVector(0.0f, 0.0f, 34.0f);
 	bWantsSlideMeshRelativeLocationOffset = true;
@@ -24,17 +28,12 @@ bool UActionTestPlayerMovementComp::IsSliding() const
 void UActionTestPlayerMovementComp::TryToEndSlide()
 {
 	//如果允许碰撞，结束滑动
-	if (bInSlide)	
+	if (bInSlide)
 	{
 		if (RestoreCollisionHeightAfterSlide())
 		{
 			bInSlide = false;
 
-			AActionTestCharacter* MyOwner = Cast<AActionTestCharacter>(PawnOwner);
-			if (MyOwner)
-			{
-				MyOwner->PlaySlideFinished();
-			}
 		}
 	}
 }
@@ -62,6 +61,11 @@ void UActionTestPlayerMovementComp::PhysWalking(float deltaTime, int32 Iteration
 		const bool bWantsToSlide = MyPawn->WantsToSlide();
 		if (IsSliding())//玩家滑动结束
 		{
+			CalcCurrentSlideVelocityReduction(deltaTime);
+			CalcSlideVelocity(Velocity);
+			
+			GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, 
+				*FString::Printf(TEXT("Velocity x:%f y:%f z:%f SizeSquared:%f"), Velocity.X, Velocity.Y, Velocity.Z, Velocity.SizeSquared()));
 			
 			const float CurrentSpeedSq = Velocity.SizeSquared();
 			if (CurrentSpeedSq <= FMath::Square(MinSlideSpeed))
@@ -180,4 +184,50 @@ bool UActionTestPlayerMovementComp::RestoreCollisionHeightAfterSlide()
 	}
 
 	return true;
+}
+
+void UActionTestPlayerMovementComp::CalcCurrentSlideVelocityReduction(float DeltaTime)
+{
+	float ReductionCoef = 0.0f;
+
+	const float FloorDotVeloctiy = FVector::DotProduct(CurrentFloor.HitResult.ImpactNormal, Velocity.GetSafeNormal());
+	const bool bNeedsSlopeAdjustment = (FloorDotVeloctiy != 0.0f);
+
+	if (bNeedsSlopeAdjustment)
+	{
+		const float Mutiplier = 1.0f + FMath::Abs<float>(FloorDotVeloctiy);
+		if (FloorDotVeloctiy > 0.0f)
+		{
+			ReductionCoef += SlideVelocityReduction * Mutiplier;//下坡时增加速度
+		}
+		else
+		{
+			ReductionCoef -= SlideVelocityReduction * Mutiplier;//上坡时增加速度
+		}
+	}
+	else
+	{
+		ReductionCoef -= SlideVelocityReduction;//在平地上减速
+	}
+
+	float TimeDilation = GetWorld()->GetWorldSettings()->GetEffectiveTimeDilation();
+	CurrentSlideVelocityReduction += (ReductionCoef * TimeDilation * DeltaTime);
+}
+
+void UActionTestPlayerMovementComp::CalcSlideVelocity(FVector & OutVelocity) const
+{
+	const FVector VelocityDir = Velocity.GetSafeNormal();
+	FVector NewVelocity = Velocity + CurrentSlideVelocityReduction * VelocityDir;
+
+	const float NewSpeedSq = NewVelocity.SizeSquared();
+	if (NewSpeedSq > FMath::Square(MaxSlideSpeed))
+	{
+		NewVelocity = VelocityDir * MaxSlideSpeed;
+	}
+	else if (NewSpeedSq < FMath::Square(MinSlideSpeed))
+	{
+		NewVelocity = VelocityDir * MinSlideSpeed;
+	}
+
+	OutVelocity = NewVelocity;
 }
