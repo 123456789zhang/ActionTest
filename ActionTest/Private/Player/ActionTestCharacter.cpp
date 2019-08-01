@@ -226,7 +226,10 @@ void AActionTestCharacter::ClimbOverObstacle()
 
 	if (Hit.bBlockingHit)
 	{
-
+		const FVector DestPosition = Hit.ImpactPoint + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		const float ZDiff = DestPosition.Z - GetActorLocation().Z;
+		UE_LOG(LogActionTest, Log, TEXT("Climb over obstacle, Z difference: %f (%s)"), ZDiff,
+			(ZDiff < ClimbOverMidHeight) ? TEXT("small") : (ZDiff < ClimbOverBigHeight) ? TEXT("mid") : TEXT("big"));
 	}
 	else
 	{

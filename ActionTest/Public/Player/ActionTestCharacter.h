@@ -87,6 +87,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		UAnimMontage* HitWallMontage;
 
+	/** 中度高的障碍物 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		float ClimbOverMidHeight;
+
+	/** 高度高的障碍物 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		float ClimbOverBigHeight;
+
 private:
 
 	/** 攀爬器(或者准确地说是它的网格组件——可移动的部分) */
