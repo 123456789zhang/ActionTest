@@ -70,12 +70,12 @@ private:
 	/** 播放随机结束动画 */
 	void PlayRoundFinished();
 
-private:
+public:
 
 	/**
 	 *相机固定在地面上，即使是在玩家跳跃的时候。
 	 *但是，如果玩家跳得超过这个阈值，摄像机就会开始跟随。
-	 */
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 		float CameraHeightChangeThreshold;
 
@@ -86,6 +86,8 @@ private:
 	/** 遇到障碍物时的动画 */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		UAnimMontage* HitWallMontage;
+
+private:
 
 	/** 攀爬器(或者准确地说是它的网格组件——可移动的部分) */
 	UPROPERTY()

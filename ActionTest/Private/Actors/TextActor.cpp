@@ -38,12 +38,24 @@ ATextActor::ATextActor()
 	TempBoolGateOpenOrClose = false;
 
 	TempBool = true;
+
+	TempBoolTwo = true;
 }
 
 
 void ATextActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (TimelineComponentOne != NULL)
+	{
+		TimelineComponentOne->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	if (TimelineComponentTwo != NULL)
+	{
+		TimelineComponentTwo->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
 
 	GateTwo(1);
 }
@@ -80,15 +92,15 @@ void ATextActor::BeginPlay()
 
 	if (FloatCurveTow != NULL)
 	{
-		FOnTimelineFloat onTimelineCallback;
-		FOnTimelineEventStatic onTimelineFinishedCallback;
+		FOnTimelineFloat onTwoTimelineCallback;
+		FOnTimelineEventStatic onTwoTimelineFinishedCallback;
 
-		TimelineComponentTwo = NewObject<UTimelineComponent>(this, TEXT("TimelineComponentOne"));
+		TimelineComponentTwo = NewObject<UTimelineComponent>(this, TEXT("TimelineComponentTwo"));
 		TimelineComponentTwo->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 		this->BlueprintCreatedComponents.Add(TimelineComponentTwo);
 		TimelineComponentTwo->SetNetAddressable();
 		TimelineComponentTwo->SetPropertySetObject(this);
-		TimelineComponentTwo->SetDirectionPropertyName(FName("TimelineComponentOne"));
+		TimelineComponentTwo->SetDirectionPropertyName(FName("TimelineComponentTwo"));
 
 		TimelineComponentTwo->SetLooping(false);
 		TimelineComponentTwo->SetTimelineLength(0.5f);
@@ -96,10 +108,10 @@ void ATextActor::BeginPlay()
 
 		TimelineComponentTwo->SetPlaybackPosition(0.0f, false);
 
-		onTimelineCallback.BindUFunction(this, FName(TEXT("TwoTimelineCallback")));
-		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TwoTimelineFinishedCallback")));
-		TimelineComponentTwo->AddInterpFloat(FloatCurveOne, onTimelineCallback, FName(TEXT("TwoCurveFloatValue")), FName(TEXT("TwoTrack")));
-		TimelineComponentTwo->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+		onTwoTimelineCallback.BindUFunction(this, FName(TEXT("TwoTimelineCallback")));
+		onTwoTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TwoTimelineFinishedCallback")));
+		TimelineComponentTwo->AddInterpFloat(FloatCurveTow, onTwoTimelineCallback, FName(TEXT("TwoCurveFloatValue")), FName(TEXT("TwoTrack")));
+		TimelineComponentTwo->SetTimelineFinishedFunc(onTwoTimelineFinishedCallback);
 
 		TimelineComponentTwo->RegisterComponent();
 	}
@@ -271,6 +283,10 @@ void ATextActor::OpenTimelineTwo()
 {
 	Text->SetHiddenInGame(true);
 
-	TimelineComponentTwo->PlayFromStart();
+	if (TimelineComponentTwo != NULL)
+	{
+		TimelineComponentTwo->PlayFromStart();
+	}
+	
 }
 

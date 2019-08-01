@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "ActionTestPlayerMovementComp.h"
+#include "Animation/AnimMontage.h"
 
 APlayerPawn::APlayerPawn()
 {
@@ -14,6 +15,13 @@ APlayerPawn::APlayerPawn()
 	ConstructorHelpers::FClassFinder<UAnimInstance>
 		StaticAnim(TEXT("AnimBlueprint'/Game/Character/Anims/PlayerAnim.PlayerAnim_C'"));
 
+	ConstructorHelpers::FObjectFinder<UAnimMontage>
+		StaticHitWallMontage(TEXT("AnimMontage'/Game/Character/Animations/HitWallFromRun_Montage.HitWallFromRun_Montage'"));
+
+	if (StaticHitWallMontage.Object != NULL) {
+		HitWallMontage = StaticHitWallMontage.Object;
+	}
+	
 	
 	CrouchedEyeHeight = 64.0f;
 	BaseEyeHeight = 128.0f;
@@ -36,6 +44,9 @@ APlayerPawn::APlayerPawn()
 	
 	MoveComp->SetMinSlideSpeed(400.0f);
 	MoveComp->SetSlideHeight(135.0f);
+	MoveComp->ModSpeedObstacleHit = 0.5f;
+	MoveComp->MaxSlideSpeed = 2200.0f;
+	MoveComp->SlideVelocityReduction = 30.0f;
 
 	//Jumping/Falling
 	MoveComp->JumpZVelocity = 1050.f;
@@ -60,4 +71,5 @@ APlayerPawn::APlayerPawn()
 	NavAgentProperties.bCanWalk = true;
 	NavAgentProperties.bCanSwim = true;
 	MoveComp->NavAgentProps = NavAgentProperties;
+
 }

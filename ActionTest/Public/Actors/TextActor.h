@@ -34,22 +34,22 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		UTextRenderComponent* Text;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 		UTimelineComponent* TimelineComponentOne;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 		UTimelineComponent* TimelineComponentTwo;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, Category = Default)
 		 UCurveFloat* FloatCurveOne;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, Category = Default)
 		 UCurveFloat* FloatCurveTow;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Default)
 		FVector Scale;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Default)
 		FString TextToPrint;
 
 	UPROPERTY()

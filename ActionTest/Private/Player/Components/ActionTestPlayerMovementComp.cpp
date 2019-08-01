@@ -18,6 +18,8 @@ UActionTestPlayerMovementComp::UActionTestPlayerMovementComp()
 
 	SlideMeshRelativeLocationOffset = FVector(0.0f, 0.0f, 34.0f);
 	bWantsSlideMeshRelativeLocationOffset = true;
+
+	ModSpeedObstacleHit = 0.0f;
 }
 
 bool UActionTestPlayerMovementComp::IsSliding() const
@@ -40,6 +42,11 @@ void UActionTestPlayerMovementComp::TryToEndSlide()
 
 void UActionTestPlayerMovementComp::PauseMovementForLedgeGrab()
 {
+	SavedSpeed = Velocity.Size() * ModSpeedObstacleHit;
+
+	StopMovementImmediately();
+	DisableMovement();
+	TryToEndSlide();
 }
 
 void UActionTestPlayerMovementComp::SetMinSlideSpeed(float minSlideSpeed)

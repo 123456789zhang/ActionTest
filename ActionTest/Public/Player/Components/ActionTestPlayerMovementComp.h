@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 		float SlideVelocityReduction;
 
+	/** 遇到障碍物后的速度倍增器 */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+		float ModSpeedObstacleHit;
+
 protected:
 
 	/** 变更滑动 */
@@ -80,6 +84,9 @@ private:
 
 	/** 当玩家按下滑动按钮是为true */
 	uint32 bInSlide:1;
+
+	/** 保存修改后的速度值，动画完成后恢复 */
+	float SavedSpeed;
 
 	/** 当前降低滑动玩家速度的值 */
 	float CurrentSlideVelocityReduction;

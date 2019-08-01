@@ -11,6 +11,8 @@
 #include "Engine/World.h"
 #include "Animation/AnimInstance.h"
 #include "ActionTestPlayerController.h"
+#include "Engine/Engine.h"
+#include "Components/CapsuleComponent.h"
 
 AActionTestCharacter::AActionTestCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UActionTestPlayerMovementComp>(ACharacter::CharacterMovementComponentName))
@@ -83,7 +85,7 @@ void AActionTestCharacter::MoveBlockedBy(const FHitResult & Impact)
 			*GetCharacterMovement()->GetMovementName());
 	}
 
-	if (GetCharacterMovement()->MovementMode != MOVE_Walking && ForwardDot < -0.9f)
+	if (GetCharacterMovement()->MovementMode == MOVE_Walking && ForwardDot < -0.9f)
 	{
 		UActionTestPlayerMovementComp* MyMovement = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
 		const float Speed = FMath::Abs(FVector::DotProduct(MyMovement->Velocity, FVector::ForwardVector));
@@ -210,6 +212,26 @@ void AActionTestCharacter::OnStopSlide()
 
 void AActionTestCharacter::ClimbOverObstacle()
 {
+	//爬障碍:
+	//-有三个动画与三种预定义的障碍高度匹配
+	//-玩家移动使用根运动，结束在顶部的障碍作为动画结束
+
+	const FVector ForwardDir = GetActorForwardVector();
+	const FVector TraceStart = GetActorLocation() + ForwardDir * 150.0f + FVector(0, 0, 1) * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 150.0f);
+	const FVector TraceEnd = TraceStart + FVector(0, 0, -1) * 500.0f;
+
+	FCollisionQueryParams TraceParams(NAME_None,FCollisionQueryParams::GetUnknownStatId(),true);
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Pawn, TraceParams);
+
+	if (Hit.bBlockingHit)
+	{
+
+	}
+	else
+	{
+
+	}
 }
 
 void AActionTestCharacter::PlayRoundFinished()
