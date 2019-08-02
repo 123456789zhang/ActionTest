@@ -33,6 +33,9 @@ public:
 	/** 设置滑动时玩家的高度 */
 	void SetSlideHeight(float slideHeight);
 
+	/** 重置玩家移动 */
+	void RestoreMovement();
+
 public:
 
 	UPROPERTY(EditDefaultsOnly,Category = Config)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "TextActor.generated.h"
 
 class UArrowComponent;
@@ -51,6 +52,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Default)
 		FString TextToPrint;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> OneTimelineDirection;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> TwoTimelineDirection;
 
 	UPROPERTY()
 		float OneCurveFloatValue;

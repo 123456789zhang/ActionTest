@@ -18,13 +18,42 @@ APlayerPawn::APlayerPawn()
 	ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticHitWallMontage(TEXT("AnimMontage'/Game/Character/Animations/HitWallFromRun_Montage.HitWallFromRun_Montage'"));
 
-	if (StaticHitWallMontage.Object != NULL) {
+	ConstructorHelpers::FObjectFinder<UAnimMontage>
+		StaticJumpOnLowCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnLowCover_Montage.JumpOnLowCover_Montage'"));
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage>
+		StaticJumpOnCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnCover_Montage.JumpOnCover_Montage'"));
+
+	ConstructorHelpers::FObjectFinder<UAnimMontage>
+		StaticJumpOnHighCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnHighCover_Montage.JumpOnHighCover_Montage'"));
+	
+
+	if (StaticHitWallMontage.Object != NULL) 
+	{
 		HitWallMontage = StaticHitWallMontage.Object;
 	}
-	
+
+	if (StaticJumpOnLowCoverMontage.Object != NULL)
+	{
+		ClimbOverSmallMontage = StaticJumpOnLowCoverMontage.Object;
+	}
+
+	if (StaticJumpOnCoverMontage.Object != NULL)
+	{
+		ClimbOverMidMontage = StaticJumpOnCoverMontage.Object;
+	}
+
+	if (StaticJumpOnHighCoverMontage.Object != NULL)
+	{
+		ClimbOverBigMontage = StaticJumpOnHighCoverMontage.Object;
+	}
 	
 	CrouchedEyeHeight = 64.0f;
 	BaseEyeHeight = 128.0f;
+
+	ClimbOverMidHeight = 200;
+
+	ClimbOverBigHeight = 300;
 
 	GetCapsuleComponent()->SetCapsuleRadius(68.0f);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(176.0f);

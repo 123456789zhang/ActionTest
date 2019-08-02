@@ -123,7 +123,6 @@ void AStreetSectionLevelScriptActor::TimelineCallback_Implementation(float val)
 
 void AStreetSectionLevelScriptActor::TimelineFinishedCallback()
 {
-	UE_LOG(LogActionTest, Log, TEXT("时间轴调用完成"));
 	if (TimelineComponent != NULL)
 	{
 		TimelineComponent->PlayFromStart();

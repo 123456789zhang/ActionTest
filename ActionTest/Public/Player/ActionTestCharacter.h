@@ -70,6 +70,9 @@ private:
 	/** 播放随机结束动画 */
 	void PlayRoundFinished();
 
+	/** 恢复角色的移动状态 */
+	void ResumeMovement();
+
 public:
 
 	/**
@@ -95,6 +98,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 		float ClimbOverBigHeight;
 
+	/** 爬过小障碍物的动画 */
+	UPROPERTY(EditDefaultsOnly,Category = Animation)
+	UAnimMontage* ClimbOverSmallMontage;
+
+	/** 爬过中障碍物的动画 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ClimbOverMidMontage;
+
+	/** 爬过高障碍物的动画 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ClimbOverBigMontage;
+
 private:
 
 	/** 攀爬器(或者准确地说是它的网格组件——可移动的部分) */
@@ -112,4 +127,7 @@ private:
 
 	/** 为攀登障碍计时器的有效管理处理 */
 	FTimerHandle TimerHandle_ClimbOverObstacle;
+
+	/** 处理ResumeMovement计时器的有效管理 */
+	FTimerHandle TimerHandle_ResumeMovement;
 };

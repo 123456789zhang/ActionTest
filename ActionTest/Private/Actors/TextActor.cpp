@@ -7,7 +7,6 @@
 #include "Engine/Engine.h"
 #include "Curves/CurveFloat.h"
 #include "Curves/RichCurve.h"
-#include "Components/TimelineComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
 
@@ -74,7 +73,7 @@ void ATextActor::BeginPlay()
 		this->BlueprintCreatedComponents.Add(TimelineComponentOne);
 		TimelineComponentOne->SetNetAddressable();
 		TimelineComponentOne->SetPropertySetObject(this);
-		TimelineComponentOne->SetDirectionPropertyName(FName("TimelineComponentOne"));
+		TimelineComponentOne->SetDirectionPropertyName(FName("OneTimelineDirection"));
 
 		TimelineComponentOne->SetLooping(false);
 		TimelineComponentOne->SetTimelineLength(0.5f);
@@ -100,7 +99,7 @@ void ATextActor::BeginPlay()
 		this->BlueprintCreatedComponents.Add(TimelineComponentTwo);
 		TimelineComponentTwo->SetNetAddressable();
 		TimelineComponentTwo->SetPropertySetObject(this);
-		TimelineComponentTwo->SetDirectionPropertyName(FName("TimelineComponentTwo"));
+		TimelineComponentTwo->SetDirectionPropertyName(FName("TwoTimelineDirection"));
 
 		TimelineComponentTwo->SetLooping(false);
 		TimelineComponentTwo->SetTimelineLength(0.5f);
@@ -276,7 +275,9 @@ void ATextActor::SequenceTwo()
 {
 	Text->SetRelativeScale3D(Scale);
 
-	Text->SetText(TextToPrint);
+	FText text=FText::FromString(TextToPrint);
+
+	Text->SetText(text);
 }
 
 void ATextActor::OpenTimelineTwo()

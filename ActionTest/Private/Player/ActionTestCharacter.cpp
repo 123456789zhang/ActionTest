@@ -230,13 +230,33 @@ void AActionTestCharacter::ClimbOverObstacle()
 		const float ZDiff = DestPosition.Z - GetActorLocation().Z;
 		UE_LOG(LogActionTest, Log, TEXT("Climb over obstacle, Z difference: %f (%s)"), ZDiff,
 			(ZDiff < ClimbOverMidHeight) ? TEXT("small") : (ZDiff < ClimbOverBigHeight) ? TEXT("mid") : TEXT("big"));
+
+		UAnimMontage* Montage = (ZDiff < ClimbOverMidHeight) ? ClimbOverSmallMontage : (ZDiff < ClimbOverBigHeight) ? ClimbOverMidMontage : ClimbOverBigMontage;
+
+		//设置飞行模式，因为它需要Z变化。如果走路或跌倒，我们将不能应用Z变化
+		//这将在恢复运动中重置
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		SetActorEnableCollision(false);
+		const float Duration = PlayAnimMontage(Montage);
+		GetWorldTimerManager().SetTimer(TimerHandle_ResumeMovement, this, &AActionTestCharacter::ResumeMovement, Duration, false);
 	}
 	else
 	{
-
+		ResumeMovement();
 	}
 }
 
 void AActionTestCharacter::PlayRoundFinished()
 {
+}
+
+void AActionTestCharacter::ResumeMovement()
+{
+	SetActorEnableCollision(true);
+
+	//恢复运动状态和保存的速度
+	UActionTestPlayerMovementComp* MyMovement = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
+	MyMovement->RestoreMovement();
+
+	ClimbToMarker = NULL;
 }

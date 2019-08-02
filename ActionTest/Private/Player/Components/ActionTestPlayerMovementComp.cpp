@@ -59,6 +59,16 @@ void UActionTestPlayerMovementComp::SetSlideHeight(float slideHeight)
 	SlideHeight = slideHeight;
 }
 
+void UActionTestPlayerMovementComp::RestoreMovement()
+{
+	SetMovementMode(MOVE_Walking);
+
+	if (SavedSpeed > 0)
+	{
+		Velocity = PawnOwner->GetActorForwardVector() * SavedSpeed;
+	}
+}
+
 void UActionTestPlayerMovementComp::PhysWalking(float deltaTime, int32 Iterations)
 {
 	AActionTestCharacter* MyPawn = Cast<AActionTestCharacter>(PawnOwner);
