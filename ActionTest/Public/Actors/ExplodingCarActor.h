@@ -9,6 +9,7 @@
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UParticleSystemComponent;
 
 UCLASS()
 class ACTIONTEST_API AExplodingCarActor : public AActor

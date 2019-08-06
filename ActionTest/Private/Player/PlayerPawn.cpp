@@ -6,25 +6,26 @@
 #include "UObject/ConstructorHelpers.h"
 #include "ActionTestPlayerMovementComp.h"
 #include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
 
 APlayerPawn::APlayerPawn()
 {
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh>
 		StaticMesh(TEXT("SkeletalMesh'/Game/Character/Skel_Mesh/Character_SkelMesh.Character_SkelMesh'"));
 
-	ConstructorHelpers::FClassFinder<UAnimInstance>
+	static ConstructorHelpers::FClassFinder<UAnimInstance>
 		StaticAnim(TEXT("AnimBlueprint'/Game/Character/Anims/PlayerAnim.PlayerAnim_C'"));
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage>
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticHitWallMontage(TEXT("AnimMontage'/Game/Character/Animations/HitWallFromRun_Montage.HitWallFromRun_Montage'"));
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage>
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticJumpOnLowCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnLowCover_Montage.JumpOnLowCover_Montage'"));
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage>
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticJumpOnCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnCover_Montage.JumpOnCover_Montage'"));
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage>
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticJumpOnHighCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnHighCover_Montage.JumpOnHighCover_Montage'"));
 	
 

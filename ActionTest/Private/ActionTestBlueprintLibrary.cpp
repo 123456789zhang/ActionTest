@@ -30,7 +30,7 @@ void UActionTestBlueprintLibrary::PrepareRace(UObject * WorldContextObject)
 
 void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, float FadeOutTime)
 {
-	UWorld* const MyWorld = GEngine->GetWorldFromContextObject(WorldContextObject);
+	UWorld* const MyWorld = GEngine->GetWorldFromContextObject(WorldContextObject,EGetWorldErrorMode::Assert);
 	AActionTestGameMode* const MyGameMode = MyWorld->GetAuthGameMode<AActionTestGameMode>();
 	if (MyGameMode && MyGameMode->ActionTestPicture)
 	{
@@ -40,7 +40,7 @@ void UActionTestBlueprintLibrary::HidePicture(UObject * WorldContextObject, floa
 
 void UActionTestBlueprintLibrary::ShowHighscore(UObject * WorldContextObject, TArray<float> Times, TArray<FString> Names)
 {
-	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject));
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert));
 	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
 	if (MyHUD)
 	{
@@ -50,7 +50,7 @@ void UActionTestBlueprintLibrary::ShowHighscore(UObject * WorldContextObject, TA
 
 void UActionTestBlueprintLibrary::HideHighscore(UObject * WorldContextObject)
 {
-	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject));
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert));
 	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
 	if (MyHUD)
 	{
