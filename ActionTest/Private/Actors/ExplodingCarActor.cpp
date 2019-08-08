@@ -136,7 +136,32 @@ void AExplodingCarActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (FloatCurve != NULL)
+	{
+		FOnTimelineFloat onTimeLineCallback;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
 
+		TimelineComponent = NewObject<UTimelineComponent>(this, TEXT("TimelineComponent"));
+		TimelineComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(TimelineComponent);
+		TimelineComponent->SetNetAddressable();
+		TimelineComponent->SetPropertySetObject(this);
+		TimelineComponent->SetDirectionPropertyName(FName("TimelineDirection"));
+
+		TimelineComponent->SetLooping(false);
+		TimelineComponent->SetTimelineLength(1.0f);
+		TimelineComponent->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		TimelineComponent->SetPlaybackPosition(0.0f, false);
+
+		onTimeLineCallback.BindUFunction(this, FName(TEXT("")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("")));
+		TimelineComponent->AddInterpFloat(FloatCurve,onTimeLineCallback,FName(TEXT("CurveFloatValue")),FName(TEXT("Track")));
+		TimelineComponent->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+
+		TimelineComponent->RegisterComponent();
+
+	}
 	
 }
 

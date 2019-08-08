@@ -101,4 +101,10 @@ private:
 	UPROPERTY()
 	UTimelineComponent* TimelineComponent;
 
+	UPROPERTY()
+	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+
+	UPROPERTY()
+		float CurveFloatValue;
+
 };
