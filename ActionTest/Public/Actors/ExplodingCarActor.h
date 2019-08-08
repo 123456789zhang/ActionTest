@@ -1,15 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "ExplodingCarActor.generated.h"
 
 
 class UBoxComponent;
 class UStaticMeshComponent;
 class UParticleSystemComponent;
+class UTimelineComponent;
 
 UCLASS()
 class ACTIONTEST_API AExplodingCarActor : public AActor
@@ -28,30 +30,75 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor)override;
+
+private:
+
+	UFUNCTION()
+	void  OnColissionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void  OnCloseContactTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 车模型 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* Mesh;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	/** 碰撞 */
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Default)
 		UBoxComponent* Box1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 碰撞 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UBoxComponent* Colission;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 碰撞 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UBoxComponent* CloseContactTrigger;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 粒子系统 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UParticleSystemComponent* Explosion;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 引擎盖 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* Mask;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 后盖 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* RoofBack;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	/** 车顶 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* RoofTop;
+
+	/** 引擎盖旋转 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		FRotator MaskRotation;
+
+	/** 车顶旋转 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		FRotator RoofMidRotation;
+
+	/**后盖旋转 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		FRotator RoofBackRotation;
+
+	/** 在汽车上着陆时的速度 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+		float LaunchSpeed;
+
+	/** 时间轴 */
+	UPROPERTY(EditAnywhere, Category = Default)
+		UCurveFloat* FloatCurve;
+
+private:
+
+	UPROPERTY()
+	UTimelineComponent* TimelineComponent;
 
 };
