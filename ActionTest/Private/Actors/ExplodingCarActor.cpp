@@ -7,6 +7,9 @@
 #include "Materials/MaterialInstance.h"
 #include "Engine/Classes/Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "ActionTestCharacter.h"
+#include "TimerManager.h"
 
 
 AExplodingCarActor::AExplodingCarActor()
@@ -154,8 +157,8 @@ void AExplodingCarActor::BeginPlay()
 
 		TimelineComponent->SetPlaybackPosition(0.0f, false);
 
-		onTimeLineCallback.BindUFunction(this, FName(TEXT("")));
-		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("")));
+		onTimeLineCallback.BindUFunction(this, FName(TEXT("TimelineCallback")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback")));
 		TimelineComponent->AddInterpFloat(FloatCurve,onTimeLineCallback,FName(TEXT("CurveFloatValue")),FName(TEXT("Track")));
 		TimelineComponent->SetTimelineFinishedFunc(onTimelineFinishedCallback);
 
@@ -169,6 +172,10 @@ void AExplodingCarActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (TimelineComponent != NULL)
+	{
+		TimelineComponent->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
 }
 
 void AExplodingCarActor::OnConstruction(const FTransform & Transform)
@@ -180,22 +187,153 @@ void AExplodingCarActor::OnConstruction(const FTransform & Transform)
 	RoofBackRotation = RoofBack->GetComponentRotation();
 
 	RoofMidRotation = RoofTop->GetComponentRotation();
+
+	TempBool = true;
+
+	TempBoolGateOpenOrClose = false;
 }
 
 void AExplodingCarActor::NotifyActorBeginOverlap(AActor * OtherActor)
 {
-
+	Gate(1);
 
 	Super::NotifyActorBeginOverlap(OtherActor);
 }
 
 void AExplodingCarActor::OnColissionBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-
+	Gate(1);
 }
 
 void AExplodingCarActor::OnCloseContactTriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
+	Gate(3);
 
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_ResetObject))
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_ResetObject, this, &AExplodingCarActor::ResetObject, 10.0f, false);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_ResetObject);
+		GetWorldTimerManager().SetTimer(TimerHandle_ResetObject, this, &AExplodingCarActor::ResetObject, 10.0f, false);
+	}
+}
+
+void AExplodingCarActor::TimelineCallback(float val)
+{
+	FRotator MaskRotator(val,0.0f,0.0f);
+	Mask->AddLocalRotation(MaskRotator);
+
+	FRotator RoofBRotator((val * -0.12f), 0.0f, 0.0f);
+	RoofBack->AddLocalRotation(RoofBRotator);
+
+	FVector RoofTVector(0.0f,0.0f,(val * -0.1f));
+	RoofTop->AddLocalOffset(RoofTVector);
+}
+
+void AExplodingCarActor::TimelineFinishedCallback()
+{
+
+}
+
+void AExplodingCarActor::LaunchCharacter()
+{
+	APawn* Pawn=UGameplayStatics::GetPlayerPawn(this,0);
+
+	AActionTestCharacter* Character = Cast<AActionTestCharacter>(Pawn);
+
+	Character->LaunchCharacter(FVector(0.0f, 0.0f, LaunchSpeed),false,true);
+}
+
+void AExplodingCarActor::ResetObject()
+{
+	Mask->SetWorldRotation(MaskRotation);
+	RoofBack->SetWorldRotation(RoofBackRotation);
+	RoofTop->SetWorldRotation(RoofMidRotation);
+}
+
+void AExplodingCarActor::Gate(int32 val)
+{
+	int32 CurrentState = val;
+
+	do
+	{
+		switch (CurrentState)
+		{
+		case 1:
+			{
+				if (TempBool)
+				{
+					if (TempBoolGateOpenOrClose)
+					{
+						if (TempBoolGateOpenOrClose)
+						{
+							TempBool = false;
+						}
+						else
+						{
+							TempBool = true;
+						}
+					}
+				}
+
+				if (TempBool)
+				{
+					SequenceMethod();
+				}
+					
+				CurrentState = -1;
+
+				break;
+
+			}
+		case 2: //Open
+			{
+				CurrentState = 1;
+
+				TempBool = true;
+
+				break;
+			}
+		case 3: //close
+			{
+				CurrentState = 1;
+
+				TempBool = false;
+
+				break;
+			}
+		}
+
+	} while (CurrentState != -1);
+	
+}
+
+void AExplodingCarActor::SequenceMethod()
+{
+
+	UGameplayStatics::SpawnSoundAttached(NULL, Explosion, NAME_None, FVector(0.0f), FRotator(0.0f), EAttachLocation::KeepRelativeOffset, false, 1.3f, 1.0f, 0.0f);
+
+	Explosion->Activate(false);
+
+	UGameplayStatics::SpawnSoundAttached(NULL, Explosion, NAME_None, FVector(0.0f), FRotator(0.0f), EAttachLocation::KeepRelativeOffset, false, 0.3f, 1.3f, 0.0f);
+
+	TimelineComponent->PlayFromStart();
+
+	GetWorldTimerManager().SetTimer(TimerHandle_LaunchCharacter, this, &AExplodingCarActor::LaunchCharacter, 0.1f, false);
+
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_ResetObject))
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_ResetObject, this, &AExplodingCarActor::ResetObject, 10.0f, false);
+	}
+	else 
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_ResetObject);
+		GetWorldTimerManager().SetTimer(TimerHandle_ResetObject, this, &AExplodingCarActor::ResetObject, 10.0f, false);
+	}
+
+
+	Gate(3);
 }
 

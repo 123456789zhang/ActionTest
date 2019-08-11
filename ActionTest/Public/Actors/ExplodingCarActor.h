@@ -42,6 +42,22 @@ private:
 	UFUNCTION()
 	void  OnCloseContactTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	UFUNCTION()
+	void TimelineCallback(float val);
+
+	UFUNCTION()
+	void TimelineFinishedCallback();
+
+	UFUNCTION()
+	void LaunchCharacter();
+
+	UFUNCTION()
+	void ResetObject();
+
+	void Gate(int32 val);
+
+	void SequenceMethod();
+
 public:
 
 	/** 车模型 */
@@ -106,5 +122,15 @@ private:
 
 	UPROPERTY()
 		float CurveFloatValue;
+
+	FTimerHandle TimerHandle_LaunchCharacter;
+
+	FTimerHandle TimerHandle_ResetObject;
+
+	UPROPERTY()
+	bool TempBool;
+
+	UPROPERTY()
+	bool TempBoolGateOpenOrClose;
 
 };
