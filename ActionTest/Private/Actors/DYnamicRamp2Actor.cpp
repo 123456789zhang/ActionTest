@@ -5,6 +5,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 
 ADYnamicRamp2Actor::ADYnamicRamp2Actor()
@@ -16,7 +17,6 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	RootComponent = Pirvot;
 
 	Box1 = CreateDefaultSubobject<UBoxComponent>(TEXT("Box1"));
-
 	Box1->SetRelativeLocation(FVector(934.0,85.0f,9.0f));
 	Box1->SetRelativeScale3D(FVector(18.5f, 7.0f, 1.0f));
 	Box1->SetBoxExtent(FVector(50.0f,32.0f,32.0f));
@@ -24,12 +24,17 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	Box1->SetCollisionProfileName(FName(TEXT("InvisibleWallDynamic")));
 	Box1->SetupAttachment(RootComponent);
 
+	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
 	Trigger->SetRelativeLocation(FVector(-156.0f, 0.0f, 226.0f));
 	Trigger->SetRelativeScale3D(FVector(4.0f, 5.2f, 7.6f));
 	Trigger->SetCollisionProfileName(FName(TEXT("Custom")));
 	Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	Trigger->SetupAttachment(RootComponent);
+
+	FComponentBeginOverlapSignature BeginOverlap;
+	BeginOverlap.__Internal_AddDynamic(this, &ADYnamicRamp2Actor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
+	Trigger->OnComponentBeginOverlap = BeginOverlap;
 
 	Explosion = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion"));
 	Explosion->SetAutoActivate(false);
@@ -59,6 +64,32 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	StaticMesh4->BodyInstance.bAutoWeld = false;
 	StaticMesh4->SetCollisionProfileName(FName(TEXT("NoCollision")));
 	StaticMesh4->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>
+		StaticMeshOne(TEXT("StaticMesh'/Game/Environment/meshes/SM_Roof_01.SM_Roof_01'"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>
+		StaticMeshTwo(TEXT("StaticMesh'/Game/Environment/SM_Ad_06.SM_Ad_06'"));
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>
+		StaticParticleSystem(TEXT("ParticleSystem'/Game/Environment/particles/Car_explosion1.Car_explosion1'"));
+
+	if (StaticMeshOne.Object != NULL)
+	{
+		StaticMesh1->SetStaticMesh(StaticMeshOne.Object);
+		StaticMesh2->SetStaticMesh(StaticMeshOne.Object);
+		StaticMesh3->SetStaticMesh(StaticMeshOne.Object);
+	}
+
+	if (StaticMeshTwo.Object != NULL)
+	{
+		StaticMesh4->SetStaticMesh(StaticMeshTwo.Object);
+	}
+
+	if (StaticParticleSystem.Object != NULL)
+	{
+		Explosion->SetTemplate(StaticParticleSystem.Object);
+	}
 }
 
 
@@ -66,6 +97,10 @@ void ADYnamicRamp2Actor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ADYnamicRamp2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
 }
 
 
