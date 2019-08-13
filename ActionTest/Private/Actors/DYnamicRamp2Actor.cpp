@@ -6,7 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "UObject/ConstructorHelpers.h"
-
+#include "TimerManager.h"
+#include "Engine/Engine.h"
 
 ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 {
@@ -90,17 +91,49 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	{
 		Explosion->SetTemplate(StaticParticleSystem.Object);
 	}
+
+	bIsBranch = true;
 }
 
 
 void ADYnamicRamp2Actor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (FloatCurve != NULL)
+	{
+		FOnTimelineFloat onTimelineCallback;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+
+		Timeline = NewObject<UTimelineComponent>(this,TEXT("Timeline"));
+		Timeline->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(Timeline);
+		Timeline->SetNetAddressable();
+		Timeline->SetPropertySetObject(this);
+		Timeline->SetDirectionPropertyName(FName("TimelineDirection"));
+
+		Timeline->SetLooping(false);
+		Timeline->SetTimelineLength(1.0f);
+		Timeline->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		Timeline->SetPlaybackPosition(0.0f, false);
+		onTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback")));
+		Timeline->AddInterpFloat(FloatCurve, onTimelineCallback, FName(TEXT("CurveFloatValue")), FName(TEXT("Track")));
+		Timeline->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+
+		Timeline->RegisterComponent();
+	}
+
 	
 }
 
 void ADYnamicRamp2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
+	if (bIsBranch)
+	{
+		GetWorldTimerManager().SetTimer(TimeHanlde_FlatFalling, this, &ADYnamicRamp2Actor::FlatFalling, 0.25f, false);
+	}
 }
 
 
@@ -108,5 +141,40 @@ void ADYnamicRamp2Actor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (Timeline != NULL)
+	{
+		Timeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+}
+
+void ADYnamicRamp2Actor::FlatFalling()
+{
+	Explosion->SetActive(true);
+
+	Timeline->PlayFromStart();
+}
+
+void ADYnamicRamp2Actor::ResetPivot()
+{
+	Pirvot->SetWorldRotation(FRotator(0.0f));
+}
+
+void ADYnamicRamp2Actor::TimelineCallback(float val)
+{
+	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("ETimelineDirection"), true);
+
+	if (EnumPtr)
+	{
+		FName EnumName=EnumPtr->GetNameByValue((int64)(TimelineDirection));
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("TimelineDirection:%s"), *EnumName.ToString()));
+	}
+
+	FRotator Rotator(val,0.0f,0.0f);
+	Pirvot->SetWorldRotation(Rotator);
+}
+
+void ADYnamicRamp2Actor::TimelineFinishedCallback()
+{
+	GetWorldTimerManager().SetTimer(TimeHanlde_ResetPivot, this, &ADYnamicRamp2Actor::ResetPivot, 15.0f, false);
 }
 

@@ -32,6 +32,18 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
+private:
+
+	void FlatFalling();
+
+	void ResetPivot();
+
+	UFUNCTION()
+	void TimelineCallback(float val);
+
+	UFUNCTION()
+	void TimelineFinishedCallback();
+
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
@@ -57,5 +69,26 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* StaticMesh4;
+
+	UPROPERTY(EditAnywhere, Category = Default)
+		UCurveFloat* FloatCurve;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+
+	UPROPERTY()
+		UTimelineComponent* Timeline;
+
+private:
+
+	UPROPERTY()
+		bool bIsBranch;
+
+	UPROPERTY()
+		float CurveFloatValue;
+
+	FTimerHandle TimeHanlde_FlatFalling;
+
+	FTimerHandle TimeHanlde_ResetPivot;
 
 };
