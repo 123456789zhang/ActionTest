@@ -5,20 +5,31 @@
 #include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Materials/Material.h"
 
 
 AElevator2Actor::AElevator2Actor()
 {
+	static ConstructorHelpers::FObjectFinder<UMaterial>
+		StaticMeshMaterial(TEXT("Material'/Game/Environment/M_Metal_01_TEMP.M_Metal_01_TEMP'"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>
+		StaticMeshOne(TEXT("StaticMesh'/Game/Environment/Elevator_short.Elevator_short'"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>
+		StaticMeshTwo(TEXT("StaticMesh'/Game/Environment/meshes/EditorCube.EditorCube'"));
+
 	GetMesh()->SetRelativeLocation(FVector(-30.0f, 0.0f, 37.0f));
 	GetMesh()->CastShadow = false;
 	GetMesh()->bAffectDynamicIndirectLighting = false;
 	GetMesh()->bCastDynamicShadow = false;
 	GetMesh()->bCastStaticShadow = false;
 	GetMesh()->bHiddenInGame = true;
+	GetMesh()->SetMaterial(0, StaticMeshMaterial.Object);
 
 	Elev = CreateDefaultSubobject<UArrowComponent>(TEXT("Elev"));
 	Elev->SetRelativeLocation(FVector(404.33f,1.2f,-105.7f));
-	Elev->SetupAttachment(RootComponent);
 
 	StaticMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh1"));
 	StaticMesh1->SetRelativeLocation(FVector(3450.0f,0.0f,300.61f));
@@ -26,6 +37,7 @@ AElevator2Actor::AElevator2Actor()
 	StaticMesh1->BodyInstance.bAutoWeld = false;
 	StaticMesh1->SetCollisionProfileName(TEXT("NoCollision"));
 	StaticMesh1->CastShadow = false;
+	StaticMesh1->SetStaticMesh(StaticMeshOne.Object);
 	StaticMesh1->SetupAttachment(Elev);
 
 	StaticMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh2"));
@@ -35,12 +47,16 @@ AElevator2Actor::AElevator2Actor()
 	StaticMesh2->SetCollisionProfileName(TEXT("BlockAll"));
 	StaticMesh2->CastShadow = false;
 	StaticMesh2->SetHiddenInGame(true);
+	StaticMesh2->SetStaticMesh(StaticMeshTwo.Object);
 	StaticMesh2->SetupAttachment(StaticMesh1);
 
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
-	Trigger->SetRelativeTransform(FTransform(FRotator(0.0f), FVector(-4096.0f, 0.0f, 0.0f), FVector(4.0f, 1.0f, 8.0f));
+	Trigger->SetRelativeTransform(FTransform(FRotator(0.0f), FVector(-4096.0f, 0.0f, 0.0f), FVector(4.0f, 1.0f, 8.0f)));
 	Trigger->SetBoxExtent(FVector(128.0f, 128.0f, 1024.0f));
 	Trigger->bAlwaysCreatePhysicsState = true;
+	FComponentBeginOverlapSignature BeginOverlap;
+	BeginOverlap.__Internal_AddDynamic(this, &AElevator2Actor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
+	Trigger->OnComponentBeginOverlap = BeginOverlap;
 	Trigger->SetupAttachment(Elev);
 
 	SoundStop = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundStop"));
@@ -64,4 +80,32 @@ AElevator2Actor::AElevator2Actor()
 	SoundStart->AttenuationOverrides.LPFRadiusMin = 2000.0f;
 	SoundStart->AttenuationOverrides.LPFRadiusMax = 3000.0f;
 	SoundStart->SetupAttachment(Elev);
+}
+
+void AElevator2Actor::OnConstruction(const FTransform & Transform)
+{
+	Super::OnConstruction(Transform);
+
+	//low_position = GetMesh()->GetComponentLocation().Z;
+
+	//Trigger->AddRelativeLocation(FVector(TriggerOffset, 0.0f, 0.0f));
+
+	Elev->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+
+	bTempOnce = false;
+}
+
+void AElevator2Actor::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+}
+
+void AElevator2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	if (!bTempOnce)
+	{
+
+	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/ActionTestClimbMarker.h"
+#include "Components/TimelineComponent.h"
 #include "Elevator2Actor.generated.h"
 
 
@@ -22,6 +23,17 @@ class ACTIONTEST_API AElevator2Actor : public AActionTestClimbMarker
 public:
 
 	AElevator2Actor();
+
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+protected:
+
+	virtual void BeginPlay() override;
+
+private:
+
+	UFUNCTION()
+	void TriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 public:
 
@@ -46,21 +58,41 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 		bool bDirection;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UArrowComponent* Elev;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UStaticMeshComponent* StaticMesh1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UStaticMeshComponent* StaticMesh2;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UBoxComponent* Trigger;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UAudioComponent* SoundStop;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = Default)
 		UAudioComponent* SoundStart;
+
+	UPROPERTY()
+		UTimelineComponent* TimelineComponentOne;
+
+	UPROPERTY()
+		UTimelineComponent* TimelineComponentTwo;
+
+	UPROPERTY()
+		UTimelineComponent* TimelineComponentThree;
+
+	UPROPERTY()
+		UTimelineComponent* TimelineComponentFour;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+		UCurveFloat* CurveOne;
+
+private:
+
+	UPROPERTY()
+		bool bTempOnce;
 };
