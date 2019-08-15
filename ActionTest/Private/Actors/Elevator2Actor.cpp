@@ -99,7 +99,68 @@ void AElevator2Actor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FOnTimelineEventStatic onTimelineFinishedCallbackTwo;
+	TimelineComponentTwo = NewObject<UTimelineComponent>(this,TEXT("TimelineComponentTwo"));
+	TimelineComponentTwo->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	this->BlueprintCreatedComponents.Add(TimelineComponentTwo);
+	TimelineComponentTwo->SetNetAddressable();
+	TimelineComponentTwo->SetPropertySetObject(this);
+	TimelineComponentTwo->SetLooping(false);
+	TimelineComponentTwo->SetTimelineLength(10.0f);
+	TimelineComponentTwo->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+	TimelineComponentTwo->SetPlaybackPosition(0.0f, false);
+	onTimelineFinishedCallbackTwo.BindUFunction(this,FName(TEXT("TimelineFinishedCallback_PlaySoundStart")));
+	TimelineComponentTwo->SetTimelineFinishedFunc(onTimelineFinishedCallbackTwo);
+	TimelineComponentTwo->RegisterComponent();
 
+	FOnTimelineEventStatic onTimelineFinishedCallbackThree;
+	TimelineComponentThree = NewObject<UTimelineComponent>(this, TEXT("TimelineComponentThree"));
+	TimelineComponentThree->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	this->BlueprintCreatedComponents.Add(TimelineComponentThree);
+	TimelineComponentThree->SetNetAddressable();
+	TimelineComponentThree->SetPropertySetObject(this);
+	TimelineComponentThree->SetLooping(false);
+	TimelineComponentThree->SetTimelineLength(10.0f);
+	TimelineComponentThree->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+	TimelineComponentThree->SetPlaybackPosition(0.0f, false);
+	onTimelineFinishedCallbackThree.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_StartPlaySound")));
+	TimelineComponentThree->SetTimelineFinishedFunc(onTimelineFinishedCallbackThree);
+	TimelineComponentThree->RegisterComponent();
+
+	FOnTimelineEventStatic onTimelineFinishedCallbackFour;
+	TimelineComponentFour = NewObject<UTimelineComponent>(this, TEXT("TimelineComponentFour"));
+	TimelineComponentFour->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	this->BlueprintCreatedComponents.Add(TimelineComponentFour);
+	TimelineComponentFour->SetNetAddressable();
+	TimelineComponentFour->SetPropertySetObject(this);
+	TimelineComponentFour->SetLooping(false);
+	TimelineComponentFour->SetTimelineLength(10.0f);
+	TimelineComponentFour->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+	TimelineComponentFour->SetPlaybackPosition(0.0f, false);
+	onTimelineFinishedCallbackFour.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_TimelineOneReverse")));
+	TimelineComponentFour->SetTimelineFinishedFunc(onTimelineFinishedCallbackFour);
+	TimelineComponentFour->RegisterComponent();
+
+	if (CurveOne != NULL)
+	{
+		FOnTimelineFloat onTimelineCallback;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+
+		TimelineComponentOne = NewObject<UTimelineComponent>(this, TEXT("TimelineComponentOne"));
+		TimelineComponentOne->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(TimelineComponentOne);
+		TimelineComponentOne->SetNetAddressable();
+		TimelineComponentOne->SetPropertySetObject(this);
+		TimelineComponentOne->SetLooping(false);
+		TimelineComponentOne->SetTimelineLength(10.0f);
+		TimelineComponentOne->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+		TimelineComponentOne->SetPlaybackPosition(0.0f, false);
+		onTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback_Elevator")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_TimelineOneReverse")));
+		TimelineComponentOne->AddInterpFloat(CurveOne, onTimelineCallback);
+		TimelineComponentOne->SetTimelineFinishedFunc(onTimelineFinishedCallbackFour);
+		TimelineComponentOne->RegisterComponent();
+	}
 }
 
 void AElevator2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -108,4 +169,20 @@ void AElevator2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedCompon
 	{
 
 	}
+}
+
+void AElevator2Actor::TimelineCallback_Elevator()
+{
+}
+
+void AElevator2Actor::TimelineFinishedCallback_StopPlaySound()
+{
+}
+
+void AElevator2Actor::TimelineFinishedCallback_TimelineOneReverse()
+{
+}
+
+void AElevator2Actor::TimelineFinishedCallback_StartPlaySound()
+{
 }

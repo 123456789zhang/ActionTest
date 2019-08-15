@@ -35,6 +35,18 @@ private:
 	UFUNCTION()
 	void TriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	UFUNCTION()
+	void TimelineCallback_Elevator();
+
+	UFUNCTION()
+	void TimelineFinishedCallback_StartPlaySound();
+
+	UFUNCTION()
+	void TimelineFinishedCallback_StopPlaySound();
+
+	UFUNCTION()
+	void TimelineFinishedCallback_TimelineOneReverse();
+
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
@@ -90,6 +102,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 		UCurveFloat* CurveOne;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> OneTimelineDirection;
 
 private:
 
