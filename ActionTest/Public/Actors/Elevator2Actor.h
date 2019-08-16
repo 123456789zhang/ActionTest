@@ -26,9 +26,12 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 
 	virtual void BeginPlay() override;
+
 
 private:
 
@@ -36,16 +39,19 @@ private:
 	void TriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UFUNCTION()
-	void TimelineCallback_Elevator();
+	void TimelineCallbackElevator(float val);
 
 	UFUNCTION()
-	void TimelineFinishedCallback_StartPlaySound();
+	void TimelineFinishedCallbackIsExecute();
 
 	UFUNCTION()
-	void TimelineFinishedCallback_StopPlaySound();
+	void TimelineFinishedCallbackStartPlaySound();
 
 	UFUNCTION()
-	void TimelineFinishedCallback_TimelineOneReverse();
+	void TimelineFinishedCallbackStopPlaySound();
+
+	UFUNCTION()
+	void TimelineFinishedCallbackTimelineOneReverse();
 
 public:
 
@@ -110,4 +116,7 @@ private:
 
 	UPROPERTY()
 		bool bTempOnce;
+
+	UPROPERTY()
+		float CurveFloatValue;
 };

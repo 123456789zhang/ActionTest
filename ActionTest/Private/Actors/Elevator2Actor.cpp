@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
+#include "Engine/Engine.h"
 
 
 AElevator2Actor::AElevator2Actor()
@@ -54,9 +55,7 @@ AElevator2Actor::AElevator2Actor()
 	Trigger->SetRelativeTransform(FTransform(FRotator(0.0f), FVector(-4096.0f, 0.0f, 0.0f), FVector(4.0f, 1.0f, 8.0f)));
 	Trigger->SetBoxExtent(FVector(128.0f, 128.0f, 1024.0f));
 	Trigger->bAlwaysCreatePhysicsState = true;
-	FComponentBeginOverlapSignature BeginOverlap;
-	BeginOverlap.__Internal_AddDynamic(this, &AElevator2Actor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
-	Trigger->OnComponentBeginOverlap = BeginOverlap;
+	Trigger->OnComponentBeginOverlap.__Internal_AddDynamic(this, &AElevator2Actor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
 	Trigger->SetupAttachment(Elev);
 
 	SoundStop = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundStop"));
@@ -80,19 +79,46 @@ AElevator2Actor::AElevator2Actor()
 	SoundStart->AttenuationOverrides.LPFRadiusMin = 2000.0f;
 	SoundStart->AttenuationOverrides.LPFRadiusMax = 3000.0f;
 	SoundStart->SetupAttachment(Elev);
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AElevator2Actor::OnConstruction(const FTransform & Transform)
 {
 	Super::OnConstruction(Transform);
 
-	//low_position = GetMesh()->GetComponentLocation().Z;
+	low_position = GetMesh()->GetComponentLocation().Z;
 
-	//Trigger->AddRelativeLocation(FVector(TriggerOffset, 0.0f, 0.0f));
+	Trigger->AddRelativeLocation(FVector(TriggerOffset, 0.0f, 0.0f));
 
 	Elev->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	bTempOnce = false;
+}
+
+void AElevator2Actor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (TimelineComponentOne != NULL)
+	{
+		TimelineComponentOne->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	if (TimelineComponentTwo != NULL)
+	{
+		TimelineComponentTwo->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	if (TimelineComponentThree != NULL)
+	{
+		TimelineComponentThree->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	if (TimelineComponentFour != NULL)
+	{
+		TimelineComponentFour->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
 }
 
 void AElevator2Actor::BeginPlay()
@@ -109,7 +135,7 @@ void AElevator2Actor::BeginPlay()
 	TimelineComponentTwo->SetTimelineLength(10.0f);
 	TimelineComponentTwo->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 	TimelineComponentTwo->SetPlaybackPosition(0.0f, false);
-	onTimelineFinishedCallbackTwo.BindUFunction(this,FName(TEXT("TimelineFinishedCallback_PlaySoundStart")));
+	onTimelineFinishedCallbackTwo.BindUFunction(this,FName(TEXT("TimelineFinishedCallbackStartPlaySound")));
 	TimelineComponentTwo->SetTimelineFinishedFunc(onTimelineFinishedCallbackTwo);
 	TimelineComponentTwo->RegisterComponent();
 
@@ -123,7 +149,7 @@ void AElevator2Actor::BeginPlay()
 	TimelineComponentThree->SetTimelineLength(10.0f);
 	TimelineComponentThree->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 	TimelineComponentThree->SetPlaybackPosition(0.0f, false);
-	onTimelineFinishedCallbackThree.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_StartPlaySound")));
+	onTimelineFinishedCallbackThree.BindUFunction(this, FName(TEXT("TimelineFinishedCallbackStartPlaySound")));
 	TimelineComponentThree->SetTimelineFinishedFunc(onTimelineFinishedCallbackThree);
 	TimelineComponentThree->RegisterComponent();
 
@@ -137,7 +163,7 @@ void AElevator2Actor::BeginPlay()
 	TimelineComponentFour->SetTimelineLength(10.0f);
 	TimelineComponentFour->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 	TimelineComponentFour->SetPlaybackPosition(0.0f, false);
-	onTimelineFinishedCallbackFour.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_TimelineOneReverse")));
+	onTimelineFinishedCallbackFour.BindUFunction(this, FName(TEXT("TimelineFinishedCallbackTimelineOneReverse")));
 	TimelineComponentFour->SetTimelineFinishedFunc(onTimelineFinishedCallbackFour);
 	TimelineComponentFour->RegisterComponent();
 
@@ -152,12 +178,12 @@ void AElevator2Actor::BeginPlay()
 		TimelineComponentOne->SetNetAddressable();
 		TimelineComponentOne->SetPropertySetObject(this);
 		TimelineComponentOne->SetLooping(false);
-		TimelineComponentOne->SetTimelineLength(10.0f);
+		TimelineComponentOne->SetTimelineLength(4.0f);
 		TimelineComponentOne->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
 		TimelineComponentOne->SetPlaybackPosition(0.0f, false);
-		onTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback_Elevator")));
-		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback_TimelineOneReverse")));
-		TimelineComponentOne->AddInterpFloat(CurveOne, onTimelineCallback);
+		onTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallbackElevator")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallbackIsExecute")));
+		TimelineComponentOne->AddInterpFloat(CurveOne, onTimelineCallback,FName(TEXT("CurveFloatValue")),FName(TEXT("Track")));
 		TimelineComponentOne->SetTimelineFinishedFunc(onTimelineFinishedCallbackFour);
 		TimelineComponentOne->RegisterComponent();
 	}
@@ -167,22 +193,47 @@ void AElevator2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedCompon
 {
 	if (!bTempOnce)
 	{
+		SoundStart->Play();
 
+		TimelineComponentTwo->PlayFromStart();
+		TimelineComponentThree->PlayFromStart();
+		TimelineComponentFour->PlayFromStart();
+
+		if (TimelineComponentOne != NULL)
+		{
+			TimelineComponentOne->PlayFromStart();
+		}
 	}
 }
 
-void AElevator2Actor::TimelineCallback_Elevator()
+void AElevator2Actor::TimelineCallbackElevator(float val)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, *FString::Printf(TEXT("%f"), val));
+	
+	FVector WorldLocation =  GetMesh()->GetComponentLocation();
+
+	WorldLocation.Z = low_position + val;
+
+	GetMesh()->SetWorldLocation(WorldLocation);
 }
 
-void AElevator2Actor::TimelineFinishedCallback_StopPlaySound()
+void AElevator2Actor::TimelineFinishedCallbackIsExecute()
 {
+	bTempOnce = false;
 }
 
-void AElevator2Actor::TimelineFinishedCallback_TimelineOneReverse()
+void AElevator2Actor::TimelineFinishedCallbackStopPlaySound()
 {
+	SoundStop->Play(0.0f);
 }
 
-void AElevator2Actor::TimelineFinishedCallback_StartPlaySound()
+void AElevator2Actor::TimelineFinishedCallbackTimelineOneReverse()
 {
+	TimelineComponentOne->Reverse();
+}
+
+void AElevator2Actor::TimelineFinishedCallbackStartPlaySound()
+{
+	SoundStart->FadeOut(0.0f,0.0f);
+	SoundStart->Stop();
 }
