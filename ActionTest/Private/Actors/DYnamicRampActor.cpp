@@ -1,15 +1,15 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "DYnamicRamp2Actor.h"
+#include "DYnamicRampActor.h"
+#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/ArrowComponent.h"
 #include "UObject/ConstructorHelpers.h"
-#include "TimerManager.h"
 #include "Engine/Engine.h"
+#include "TimerManager.h"
 
-ADYnamicRamp2Actor::ADYnamicRamp2Actor()
+ADYnamicRampActor::ADYnamicRampActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -18,9 +18,9 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	RootComponent = Pirvot;
 
 	Box1 = CreateDefaultSubobject<UBoxComponent>(TEXT("Box1"));
-	Box1->SetRelativeLocation(FVector(934.0,85.0f,9.0f));
+	Box1->SetRelativeLocation(FVector(934.0, 85.0f, 9.0f));
 	Box1->SetRelativeScale3D(FVector(18.5f, 7.0f, 1.0f));
-	Box1->SetBoxExtent(FVector(50.0f,32.0f,32.0f));
+	Box1->SetBoxExtent(FVector(50.0f, 32.0f, 32.0f));
 	Box1->BodyInstance.bNotifyRigidBodyCollision = true;
 	Box1->SetCollisionProfileName(FName(TEXT("InvisibleWallDynamic")));
 	Box1->SetupAttachment(RootComponent);
@@ -34,7 +34,7 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 	Trigger->SetupAttachment(RootComponent);
 
 	FComponentBeginOverlapSignature BeginOverlap;
-	BeginOverlap.__Internal_AddDynamic(this, &ADYnamicRamp2Actor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
+	BeginOverlap.__Internal_AddDynamic(this, &ADYnamicRampActor::TriggerBeginOverlap, FName(TEXT("TriggerBeginOverlap")));
 	Trigger->OnComponentBeginOverlap = BeginOverlap;
 
 	Explosion = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Explosion"));
@@ -96,7 +96,7 @@ ADYnamicRamp2Actor::ADYnamicRamp2Actor()
 }
 
 
-void ADYnamicRamp2Actor::BeginPlay()
+void ADYnamicRampActor::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -105,7 +105,7 @@ void ADYnamicRamp2Actor::BeginPlay()
 		FOnTimelineFloat onTimelineCallback;
 		FOnTimelineEventStatic onTimelineFinishedCallback;
 
-		Timeline = NewObject<UTimelineComponent>(this,TEXT("Timeline"));
+		Timeline = NewObject<UTimelineComponent>(this, TEXT("Timeline"));
 		Timeline->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 		this->BlueprintCreatedComponents.Add(Timeline);
 		Timeline->SetNetAddressable();
@@ -125,20 +125,19 @@ void ADYnamicRamp2Actor::BeginPlay()
 		Timeline->RegisterComponent();
 	}
 
-	
+
 }
 
-void ADYnamicRamp2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ADYnamicRampActor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if (bIsBranch)
+	if (FMath::RandBool())
 	{
-		GetWorldTimerManager().SetTimer(TimeHanlde_FlatFalling, this, &ADYnamicRamp2Actor::FlatFalling, 0.25f, false);
-
+		GetWorldTimerManager().SetTimer(TimeHanlde_FlatFalling, this, &ADYnamicRampActor::FlatFalling, 0.25f, false);
 	}
 }
 
 
-void ADYnamicRamp2Actor::Tick(float DeltaTime)
+void ADYnamicRampActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -148,34 +147,34 @@ void ADYnamicRamp2Actor::Tick(float DeltaTime)
 	}
 }
 
-void ADYnamicRamp2Actor::FlatFalling()
+void ADYnamicRampActor::FlatFalling()
 {
 	Explosion->SetActive(true);
 
 	Timeline->PlayFromStart();
 }
 
-void ADYnamicRamp2Actor::ResetPivot()
+void ADYnamicRampActor::ResetPivot()
 {
 	Pirvot->SetWorldRotation(FRotator(0.0f));
 }
 
-void ADYnamicRamp2Actor::TimelineCallback(float val)
+void ADYnamicRampActor::TimelineCallback(float val)
 {
 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("ETimelineDirection"), true);
 
 	if (EnumPtr)
 	{
-		FName EnumName=EnumPtr->GetNameByValue((int64)(TimelineDirection));
+		FName EnumName = EnumPtr->GetNameByValue((int64)(TimelineDirection));
 		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("TimelineDirection:%s"), *EnumName.ToString()));
 	}
 
-	FRotator Rotator(val,0.0f,0.0f);
+	FRotator Rotator(val, 0.0f, 0.0f);
 	Pirvot->SetWorldRotation(Rotator);
 }
 
-void ADYnamicRamp2Actor::TimelineFinishedCallback()
+void ADYnamicRampActor::TimelineFinishedCallback()
 {
-	GetWorldTimerManager().SetTimer(TimeHanlde_ResetPivot, this, &ADYnamicRamp2Actor::ResetPivot, 15.0f, false);
+	GetWorldTimerManager().SetTimer(TimeHanlde_ResetPivot, this, &ADYnamicRampActor::ResetPivot, 15.0f, false);
 }
 

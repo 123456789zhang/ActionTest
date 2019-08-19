@@ -8,6 +8,7 @@
 #include "Curves/CurveFloat.h"
 #include "Curves/RichCurve.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 AStreetSectionLevelScriptActor::AStreetSectionLevelScriptActor()
 {
@@ -68,6 +69,8 @@ void AStreetSectionLevelScriptActor::BeginPlay()
 
 	UActionTestBlueprintLibrary::SortHighscores( Times, Names, Times, Names, 10);
 
+	RemoteEvent(FName(TEXT("LoadSectionOne")));
+
 	Save = UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlatformerSave")),0);
 
 	if (Save == nullptr)
@@ -105,6 +108,14 @@ void AStreetSectionLevelScriptActor::Tick(float DeltaTime)
 	{
 		TimelineComponent->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	}
+}
+
+void AStreetSectionLevelScriptActor::LoadSectionOne()
+{
+	FLatentActionInfo LatentInfo;
+	UGameplayStatics::LoadStreamLevel(this, FName(TEXT("Platformer_Street_01")), true, false, LatentInfo);
+	UGameplayStatics::LoadStreamLevel(this, FName(TEXT("Platformer_Street_02")), true, false, LatentInfo);
+	UGameplayStatics::LoadStreamLevel(this, FName(TEXT("Platformer_Street_03")), true, false, LatentInfo);
 }
 
 void AStreetSectionLevelScriptActor::UpdateSaveHiscores()
