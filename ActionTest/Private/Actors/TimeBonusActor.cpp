@@ -24,11 +24,27 @@ ATimeBonusActor::ATimeBonusActor()
 	TextPlane->SetupAttachment(RootComponent);
 
 	BonusMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BonusMesh"));
-
+	BonusMesh->SetRelativeScale3D(FVector(0.4f));
+	BonusMesh->BodyInstance.bAutoWeld = false;
+	BonusMesh->BodyInstance.bGenerateWakeEvents = false;
+	BonusMesh->bCastDynamicShadow = false;
+	BonusMesh->bCastStaticShadow = false;
+	BonusMesh->CastShadow = false;
+	BonusMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	BonusMesh->SetupAttachment(RootComponent);
 
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
-
+	Trigger->SetRelativeScale3D(FVector(1.0f,2.0f,2.0f));
+	Trigger->SetBoxExtent(FVector(64.0f, 128.0f, 32.0f));
+	Trigger->SetCollisionProfileName(TEXT("Custom"));
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
+	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 	Trigger->SetupAttachment(RootComponent);
 
 	Fx = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Fx"));
