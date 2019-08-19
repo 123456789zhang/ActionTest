@@ -177,6 +177,7 @@ void AElevator2Actor::BeginPlay()
 		this->BlueprintCreatedComponents.Add(TimelineComponentOne);
 		TimelineComponentOne->SetNetAddressable();
 		TimelineComponentOne->SetPropertySetObject(this);
+		TimelineComponentOne->SetDirectionPropertyName(FName(TEXT("TimelineDirection")));
 		TimelineComponentOne->SetLooping(false);
 		TimelineComponentOne->SetTimelineLength(4.0f);
 		TimelineComponentOne->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);

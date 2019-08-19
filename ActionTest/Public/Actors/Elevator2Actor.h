@@ -119,4 +119,7 @@ private:
 
 	UPROPERTY()
 		float CurveFloatValue;
+
+	UPROPERTY()
+		TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 };
