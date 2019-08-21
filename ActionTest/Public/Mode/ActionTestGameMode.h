@@ -38,6 +38,17 @@ public:
 	/** 全屏图片信息 */
 	class FActionTestPicture* ActionTestPicture;
 
+private:
+
+	/** 当前正在进行中 */
+	EGameState::Type GameState;
+
+	/** 如果玩家赢了这一轮，为真，否则为假 */
+	uint32 bRoundWasWon : 1;
+
+	/** 玩家开始这一轮的时间 */
+	float RoundStartTime;
+
 public:
 
 	/** 准备游戏状态并显示HUD信息 */
@@ -55,15 +66,9 @@ public:
 	/** 开始这一轮游戏 */
 	void StartRound();
 
-private:
+	/** 增加/减少DeltaTime一轮持续时间 */
+	void ModifyRoundDuration(float DeltaTime, bool bIncrease);
 
-	/** 当前正在进行中 */
-	EGameState::Type GameState;
-	
-	/** 如果玩家赢了这一轮，为真，否则为假 */
-	uint32 bRoundWasWon : 1;
 
-	/** 玩家开始这一轮的时间 */
-	float RoundStartTime;
 	
 };

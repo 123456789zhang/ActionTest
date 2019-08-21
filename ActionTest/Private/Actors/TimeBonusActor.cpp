@@ -10,6 +10,9 @@
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
 #include "Particles/ParticleSystem.h"
+#include "ActionTestBlueprintLibrary.h"
+#include "Components/TimelineComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ATimeBonusActor::ATimeBonusActor()
 {
@@ -34,7 +37,7 @@ ATimeBonusActor::ATimeBonusActor()
 	RootComponent = Arrow;
 
 	TextPlane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TextPlane"));
-	TextPlane->SetRelativeTransform(FTransform(FRotator(0.0f,269.9f,0.0f), FVector(0.42f,253.83f,109.5f), FVector(1.0f,1.0f,0.7f)));
+	TextPlane->SetRelativeTransform(FTransform(FRotator(0.0f, 269.9f, 0.0f), FVector(0.42f, 253.83f, 109.5f), FVector(1.0f, 1.0f, 0.7f)));
 	TextPlane->BodyInstance.bAutoWeld = false;
 	TextPlane->BodyInstance.bGenerateWakeEvents = false;
 	TextPlane->SetCollisionProfileName(TEXT("NoCollision"));
@@ -69,6 +72,9 @@ ATimeBonusActor::ATimeBonusActor()
 	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Ignore);
 	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Ignore);
 	Trigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
+	FComponentBeginOverlapSignature BeginOverlap;
+	BeginOverlap.__Internal_AddDynamic(this, &ATimeBonusActor::TiggerComponentBeginOverlap, FName(TEXT("TiggerComponentBeginOverlap")));
+	Trigger->OnComponentBeginOverlap = BeginOverlap;
 	Trigger->SetupAttachment(RootComponent);
 
 	Fx = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Fx"));
@@ -81,6 +87,54 @@ void ATimeBonusActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (CurveOne != NULL)
+	{
+		FOnTimelineFloat onTimelineCallback;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+
+		TimelineOne = NewObject<UTimelineComponent>(this, FName(TEXT("TimelineOne")));
+		TimelineOne->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(TimelineOne);
+		TimelineOne->SetNetAddressable();
+		TimelineOne->SetPropertySetObject(this);
+
+		TimelineOne->SetLooping(false);
+		TimelineOne->SetTimelineLength(3.0f);
+		TimelineOne->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		TimelineOne->SetPlaybackPosition(0.0f, false);
+		onTimelineCallback.BindUFunction(this, FName(TEXT("OneTimelineCallback")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("OneTimelineFinishedCallback")));
+		TimelineOne->AddInterpFloat(CurveOne, onTimelineCallback, FName(TEXT("CurveFloatValueOne")));
+		TimelineOne->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+
+		TimelineOne->RegisterComponent();
+	}
+
+	if (CurveTwo != NULL)
+	{
+		FOnTimelineFloat onTimelineCallback;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+
+		TimelineTwo = NewObject<UTimelineComponent>(this, FName(TEXT("TimelineTwo")));
+		TimelineTwo->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+		this->BlueprintCreatedComponents.Add(TimelineTwo);
+		TimelineTwo->SetNetAddressable();
+		TimelineTwo->SetPropertySetObject(this);
+
+		TimelineTwo->SetLooping(false);
+		TimelineTwo->SetTimelineLength(3.0f);
+		TimelineTwo->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
+
+		TimelineTwo->SetPlaybackPosition(0.0f, false);
+		onTimelineCallback.BindUFunction(this, FName(TEXT("TwoTimelineCallback")));
+		onTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TwoTimelineFinishedCallback")));
+		TimelineTwo->AddInterpFloat(CurveTwo, onTimelineCallback, FName(TEXT("CurveFloatValueTwo")));
+		TimelineTwo->SetTimelineFinishedFunc(onTimelineFinishedCallback);
+
+		TimelineTwo->RegisterComponent();
+	}
+
 	GetWorldTimerManager().SetTimer(TimerHandle_BounMeshRotator, this, &ATimeBonusActor::BounMeshRotator, 0.05f, true);
 }
 
@@ -90,13 +144,86 @@ void ATimeBonusActor::BounMeshRotator()
 
 	FRotator NewRotator(OldRotator.Pitch, OldRotator.Yaw + 100, OldRotator.Roll);
 
-	BonusMesh->SetWorldRotation(FMath::RInterpTo(OldRotator, NewRotator, 1.0f, 1.0f));
+	BonusMesh->SetWorldRotation(FMath::RInterpTo(OldRotator, NewRotator, 1.0f, 0.1f));
+}
+
+void ATimeBonusActor::TiggerComponentBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	BonusMesh->SetVisibility(false, false);
+	Fx->SetActive(false, false);
+
+	FLatentActionInfo LatentInfo;
+	LatentInfo.UUID = 123;
+	LatentInfo.Linkage = 333;
+	LatentInfo.CallbackTarget = this;
+	LatentInfo.ExecutionFunction = FName(TEXT("ShowFunction"));
+	UKismetSystemLibrary::RetriggerableDelay(this, 10.0f, LatentInfo);
+
+	UActionTestBlueprintLibrary::DecreaseRoundDuration(this, 1.0);
+
+	TextPlane->SetVisibility(true);
+
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_HiddenTextPlane))
+		GetWorldTimerManager().SetTimer(TimerHandle_HiddenTextPlane, this, &ATimeBonusActor::HiddenTextPlane, 2.0f, false);
+
+	if (TimelineOne != NULL)
+	{
+		TimelineOne->PlayFromStart();
+	}
+
+	if (TimelineTwo != NULL)
+	{
+		TimelineTwo->PlayFromStart();
+	}
+
+}
+
+void ATimeBonusActor::OneTimelineCallback(float val)
+{
+	FVector NewLoction = TextPlane->GetComponentLocation() + FVector(val * 4.0f, 0.0f, val);
+	TextPlane->SetWorldLocation(NewLoction);
+}
+
+void ATimeBonusActor::TwoTimelineCallback(float val)
+{
+	FVector NewScale = TextPlane->RelativeScale3D + FVector(val);
+	TextPlane->SetRelativeScale3D(NewScale);
+}
+
+void ATimeBonusActor::OneTimelineFinishedCallback()
+{
+	TextPlane->SetWorldLocation(TextPlaneLocation);
+}
+
+void ATimeBonusActor::TwoTimelineFinishedCallback()
+{
+	TextPlane->SetRelativeScale3D(TextPlaneScale);
+}
+
+void ATimeBonusActor::ShowFunction()
+{
+	BonusMesh->SetVisibility(true);
+	Fx->SetActive(true);
+}
+
+void ATimeBonusActor::HiddenTextPlane()
+{
+	TextPlane->SetVisibility(false);
 }
 
 void ATimeBonusActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurveOne != NULL)
+	{
+		TimelineOne->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
+
+	if (CurveTwo != NULL)
+	{
+		TimelineTwo->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
+	}
 }
 
 void ATimeBonusActor::OnConstruction(const FTransform & Transform)

@@ -67,6 +67,16 @@ void UActionTestBlueprintLibrary::AllowToRestartRace(UObject * WorldContextObjec
 	}
 }
 
+void UActionTestBlueprintLibrary::DecreaseRoundDuration(UObject * WorldContextObject, float DeltaTime)
+{
+	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		const float Delta = FMath::Abs(DeltaTime);
+		MyGame->ModifyRoundDuration(Delta, (DeltaTime > 0) ? false : true);
+	}
+}
+
 void UActionTestBlueprintLibrary::SortHighscores(TArray<float> InTimes, TArray<FString> InNames, TArray<float>& OutTimes, TArray<FString>& OutNames, int32 MaxScores)
 {
 	//首先排序时间和玩家名称

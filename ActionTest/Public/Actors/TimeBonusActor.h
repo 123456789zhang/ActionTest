@@ -10,6 +10,7 @@ class UArrowComponent;
 class UStaticMeshComponent;
 class UBoxComponent;
 class UParticleSystemComponent;
+class UTimelineComponent;
 
 UCLASS()
 class ACTIONTEST_API ATimeBonusActor : public AActor
@@ -32,21 +33,42 @@ private:
 
 	void BounMeshRotator();
 
+	UFUNCTION()
+		void TiggerComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OneTimelineCallback(float val);
+
+	UFUNCTION()
+		void TwoTimelineCallback(float val);
+
+	UFUNCTION()
+		void OneTimelineFinishedCallback();
+
+	UFUNCTION()
+		void TwoTimelineFinishedCallback();
+
+	UFUNCTION()
+		void ShowFunction();
+
+	UFUNCTION()
+		void HiddenTextPlane();
+
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UArrowComponent* Arrow;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* TextPlane;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* BonusMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UBoxComponent* Trigger;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UParticleSystemComponent* Fx;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
@@ -55,8 +77,28 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 		FVector TextPlaneScale;
 
+	UPROPERTY()
+		UTimelineComponent* TimelineOne;
+
+	UPROPERTY()
+		UTimelineComponent* TimelineTwo;
+
+	UPROPERTY(EditAnywhere,Category = Default)
+		UCurveFloat* CurveOne;
+
+	UPROPERTY(EditAnywhere, Category = Default)
+		UCurveFloat* CurveTwo;
+
+	UPROPERTY()
+		float CurveFloatValueOne;
+
+	UPROPERTY()
+		float CurveFloatValueTwo;
+
 private:
 
 	FTimerHandle TimerHandle_BounMeshRotator;
+
+	FTimerHandle TimerHandle_HiddenTextPlane;
 
 };

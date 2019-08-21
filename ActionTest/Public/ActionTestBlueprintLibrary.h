@@ -38,6 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
 		static void AllowToRestartRace(class UObject* WorldContextObject);
 
+	/** 允许改变回合持续时间，而回合仍在进行中-用于给玩家时间奖励 */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
+		static void DecreaseRoundDuration(class UObject* WorldContextObject, float DeltaTime);
+
 	/* 
 	 *	分数排序
 	 *

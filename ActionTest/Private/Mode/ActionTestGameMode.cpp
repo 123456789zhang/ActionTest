@@ -71,3 +71,7 @@ void AActionTestGameMode::StartRound()
 	RoundStartTime = GetWorld()->GetTimeSeconds();
 	GameState = EGameState::Playing;
 }
+
+void AActionTestGameMode::ModifyRoundDuration(float DeltaTime, bool bIncrease)
+{
+}
