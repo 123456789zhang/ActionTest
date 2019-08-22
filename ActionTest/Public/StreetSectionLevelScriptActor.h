@@ -25,9 +25,6 @@ public:
 
 	virtual void Tick(float DeltaTime)override;
 
-	UFUNCTION()
-	void LoadSectionOne();
-
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
