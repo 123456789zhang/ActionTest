@@ -151,7 +151,10 @@ void ADYnamicRampActor::FlatFalling()
 {
 	Explosion->SetActive(true);
 
-	Timeline->PlayFromStart();
+	if (Timeline != NULL)
+	{
+		Timeline->PlayFromStart();
+	}
 }
 
 void ADYnamicRampActor::ResetPivot()

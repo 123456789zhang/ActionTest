@@ -133,7 +133,6 @@ void ADYnamicRamp2Actor::TriggerBeginOverlap(UPrimitiveComponent * OverlappedCom
 	if (bIsBranch)
 	{
 		GetWorldTimerManager().SetTimer(TimeHanlde_FlatFalling, this, &ADYnamicRamp2Actor::FlatFalling, 0.25f, false);
-
 	}
 }
 

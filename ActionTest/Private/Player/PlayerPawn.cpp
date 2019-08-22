@@ -28,6 +28,8 @@ APlayerPawn::APlayerPawn()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>
 		StaticJumpOnHighCoverMontage(TEXT("AnimMontage'/Game/Character/Animations/JumpOnHighCover_Montage.JumpOnHighCover_Montage'"));
 	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>
+		StaticClimbLedgeMontage(TEXT("	AnimMontage'/Game/Character/Animations/LedgeGrab_Montage.LedgeGrab_Montage'"));
 
 	if (StaticHitWallMontage.Object != NULL) 
 	{
@@ -47,6 +49,11 @@ APlayerPawn::APlayerPawn()
 	if (StaticJumpOnHighCoverMontage.Object != NULL)
 	{
 		ClimbOverBigMontage = StaticJumpOnHighCoverMontage.Object;
+	}
+
+	if (StaticClimbLedgeMontage.Object != NULL)
+	{
+		ClimbLedgeMontage = StaticClimbLedgeMontage.Object;
 	}
 	
 	CrouchedEyeHeight = 64.0f;
@@ -102,4 +109,6 @@ APlayerPawn::APlayerPawn()
 	NavAgentProperties.bCanSwim = true;
 	MoveComp->NavAgentProps = NavAgentProperties;
 
+	ClimbLedgeRootOffset = FVector(212.0f,0.0f,164.0f);
+	ClimbLedgeGrabOffsetX = 112.0f;
 }

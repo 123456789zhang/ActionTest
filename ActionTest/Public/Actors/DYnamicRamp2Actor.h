@@ -46,28 +46,28 @@ private:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UArrowComponent* Pirvot;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UBoxComponent* Box1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UBoxComponent* Trigger;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UParticleSystemComponent* Explosion;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* StaticMesh1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* StaticMesh2;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* StaticMesh3;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		UStaticMeshComponent* StaticMesh4;
 
 	UPROPERTY(EditAnywhere, Category = Default)

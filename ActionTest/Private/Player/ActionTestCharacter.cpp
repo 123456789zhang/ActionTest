@@ -12,6 +12,7 @@
 #include "Animation/AnimInstance.h"
 #include "ActionTestPlayerController.h"
 #include "Engine/Engine.h"
+#include "ActionTestClimbMarker.h"
 #include "Components/CapsuleComponent.h"
 
 AActionTestCharacter::AActionTestCharacter(const FObjectInitializer& ObjectInitializer)
@@ -33,7 +34,7 @@ void AActionTestCharacter::Tick(float DeltaSeconds)
 {
 	if (!AnimPositionAdjustment.IsNearlyZero())
 	{
-		AnimPositionAdjustment = FMath::VInterpConstantTo(AnimPositionAdjustment,FVector::ZeroVector, DeltaSeconds,400.0f);
+		AnimPositionAdjustment = FMath::VInterpConstantTo(AnimPositionAdjustment, FVector::ZeroVector, DeltaSeconds, 400.0f);
 		GetMesh()->SetRelativeLocation(GetBaseTranslationOffset() + AnimPositionAdjustment);
 	}
 
@@ -102,7 +103,14 @@ void AActionTestCharacter::MoveBlockedBy(const FHitResult & Impact)
 	else if (GetCharacterMovement()->MovementMode == MOVE_Falling)
 	{
 		//如果在半空:试着爬到界标上
+		AActionTestClimbMarker* Marker = Cast<AActionTestClimbMarker>(Impact.Actor.Get());
+		if (Marker)
+		{
+			ClimbToLedge(Marker);
 
+			UActionTestPlayerMovementComp* MyMovement = Cast<UActionTestPlayerMovementComp>(GetCharacterMovement());
+			MyMovement->PauseMovementForLedgeGrab();
+		}
 	}
 }
 
@@ -220,7 +228,7 @@ void AActionTestCharacter::ClimbOverObstacle()
 	const FVector TraceStart = GetActorLocation() + ForwardDir * 150.0f + FVector(0, 0, 1) * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 150.0f);
 	const FVector TraceEnd = TraceStart + FVector(0, 0, -1) * 500.0f;
 
-	FCollisionQueryParams TraceParams(NAME_None,FCollisionQueryParams::GetUnknownStatId(),true);
+	FCollisionQueryParams TraceParams(NAME_None, FCollisionQueryParams::GetUnknownStatId(), true);
 	FHitResult Hit;
 	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Pawn, TraceParams);
 
@@ -259,4 +267,32 @@ void AActionTestCharacter::ResumeMovement()
 	MyMovement->RestoreMovement();
 
 	ClimbToMarker = NULL;
+}
+
+void AActionTestCharacter::ClimbToLedge(const AActionTestClimbMarker * Marker)
+{
+	ClimbToMarker = Marker ? Marker->FindComponentByClass<UStaticMeshComponent>() : NULL;
+	ClimbToMarkerLoaction = ClimbToMarker ? ClimbToMarker->GetComponentLocation() : FVector::ZeroVector;
+
+	//放置于标记的左上角，但保留当前的Y坐标
+	const FBox MarkerBox = Marker->GetMesh()->Bounds.GetBox();
+	const FVector DesiredPosition(MarkerBox.Min.X, GetActorLocation().Y, MarkerBox.Max.Z);
+
+	//爬上岩架:
+	// -兵被放置在顶部的窗台(使用爬升抓取偏移量抵消从抓斗点)立即
+	// - AnimPositionAdjustment修改网格的相对位置来平滑过渡
+	//(网格从大致相同的位置开始，额外的偏移量在Tick中迅速减小到零)
+
+	const FVector StartPosition = GetActorLocation();
+	FVector AdjustedPosition = DesiredPosition;
+	AdjustedPosition.X += (ClimbLedgeGrabOffsetX * GetMesh()->RelativeScale3D.X) - GetBaseTranslationOffset().X;
+	AdjustedPosition.Z += GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	TeleportTo(AdjustedPosition, GetActorRotation(), false, true);
+
+	AnimPositionAdjustment = StartPosition - (GetActorLocation() - (ClimbLedgeRootOffset * GetMesh()->RelativeScale3D));
+	GetMesh()->SetRelativeLocation(GetBaseTranslationOffset() + AnimPositionAdjustment);
+
+	const float Duration = PlayAnimMontage(ClimbLedgeMontage);
+	GetWorldTimerManager().SetTimer(TimerHandle_ResumeMovement, this, &AActionTestCharacter::ResumeMovement, Duration - 0.1f, false);
 }

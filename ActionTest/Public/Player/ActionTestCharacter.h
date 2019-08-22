@@ -73,6 +73,9 @@ private:
 	/** 恢复角色的移动状态 */
 	void ResumeMovement();
 
+	/** 在玩家攀爬时的动画和位置调整 */
+	void ClimbToLedge(const class AActionTestClimbMarker* Marker);
+
 public:
 
 	/**
@@ -110,11 +113,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* ClimbOverBigMontage;
 
+	/** 攀爬的动画 */
+	UPROPERTY(EditDefaultsOnly,Category = Animation)
+	UAnimMontage* ClimbLedgeMontage;
+
+	/** 根偏移在攀登legde动画 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		FVector ClimbLedgeRootOffset;
+
+	/** 抓取点偏移沿X轴攀登legde动画 */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+		float ClimbLedgeGrabOffsetX;
+
 private:
 
 	/** 攀爬器(或者准确地说是它的网格组件——可移动的部分) */
 	UPROPERTY()
-		UStaticMeshComponent* ClimbToMarker;
+	UStaticMeshComponent* ClimbToMarker;
 
 	/** 当玩家按住滑动按钮时为真 */
 	uint32 bPressedSlide : 1;
