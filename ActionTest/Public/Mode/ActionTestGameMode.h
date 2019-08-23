@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundFinishedDelegate);
 
 namespace EGameState
 {
-	enum Type 
+	enum Type
 	{
 		Intro,
 		Waiting,
@@ -21,7 +21,7 @@ namespace EGameState
 }
 
 /**
- * 
+ *
  */
 UCLASS()
 class ACTIONTEST_API AActionTestGameMode : public AGameModeBase
@@ -49,6 +49,12 @@ private:
 	/** 玩家开始这一轮的时间 */
 	float RoundStartTime;
 
+	/** 当前检查时间点 */
+	TArray<float> CurrentTimes;
+
+	/** 最好的检查时间 */
+	TArray<float> BastTimes;
+
 public:
 
 	/** 准备游戏状态并显示HUD信息 */
@@ -69,6 +75,28 @@ public:
 	/** 增加/减少DeltaTime一轮持续时间 */
 	void ModifyRoundDuration(float DeltaTime, bool bIncrease);
 
+	/** 获取检查点时间:当前游戏 */
+	float GetCurrentCheckpointTime(int32 CheckpointID) const;
 
-	
+	/** 获取最好的检查点时间 */
+	float GetBastCheckpointTime(int32 CheckpointID) const;
+
+	/** 保存当前时间检查点 */
+	void SaveCheckpointTime(int32 CheckpointID);
+
+	/** 完成新一轮 */
+	void FinishRound();
+
+	/** 如果回合获胜，返回true(最佳时间) */
+	bool IsRoundWon() const;
+
+	/**
+	 * 已开始的返回时间(以秒为单位)
+	 * 如果回合已经结束，则返回回合持续时间
+	 */
+	float GetRoundDuration() const;
+
+	/** 获取检查点数量 */
+	int32 GetNumCheckpoints() const;
+
 };

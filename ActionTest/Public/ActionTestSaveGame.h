@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "Interfaces/InterfaceAPI.h"
 #include "ActionTestSaveGame.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ACTIONTEST_API UActionTestSaveGame : public USaveGame
+class ACTIONTEST_API UActionTestSaveGame : public USaveGame,public IInterfaceAPI
 {
 	GENERATED_BODY()
 
@@ -29,8 +30,11 @@ public:
 public:
 
 	UFUNCTION()
-	void SetRecord(float Time,FString Name,int32 index);
+	virtual void SetRecord(float Time,FString Name,int32 index) override;
 
 	UFUNCTION()
-	void GetRecord(float& Time, FString& Name, int32 index);
+	virtual void GetRecord(float& Time, FString& Name, int32 index)override;
+
+	UFUNCTION()
+	virtual const float GetCurrentTime() override;
 };

@@ -42,6 +42,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
 		static void DecreaseRoundDuration(class UObject* WorldContextObject, float DeltaTime);
 
+	/** 返回当前轮中保存的检查点时间 */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
+		static float GetCurrentCheckpointTime(class UObject* WorldContextObject, int32 CheckpointID);
+
+	/** 返回当前检查点时间与最佳时间之间的增量(负=较好时间) */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
+		static float MarkCheckpointTime(class UObject* WorldContextObject, int32 CheckpointID);
+
+	/** 完成一轮后，玩家将能够重播，得分时返回true */
+	UFUNCTION(BlueprintCallable, Category = Game, meta = (WorldContext = "WorldContextObject"))
+		static bool FinishRace(class UObject* WorldContextObject);
+
+	/** 将时间转换为字符串，单位为mm:ss.sss格式 */
+	UFUNCTION(BlueprintPure, Category = HUD)
+		static FString DescribeTime(float TimeSeconds,bool bShowSign);
+
+	/** 显示信息 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void DisplayMessage(class UObject* WorldContextObject, FString Message, float DisplayDuration = 1.0f, float PosX = 0.5f, float PosY = 0.5f, float TextScale = 1.0f, bool bRedBorder = false);
+
 	/* 
 	 *	分数排序
 	 *

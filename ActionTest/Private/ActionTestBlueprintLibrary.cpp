@@ -77,6 +77,72 @@ void UActionTestBlueprintLibrary::DecreaseRoundDuration(UObject * WorldContextOb
 	}
 }
 
+float UActionTestBlueprintLibrary::GetCurrentCheckpointTime(UObject * WorldContextObject, int32 CheckpointID)
+{
+	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		return MyGame->GetCurrentCheckpointTime(CheckpointID);
+	}
+	return -1.0f;
+}
+
+float UActionTestBlueprintLibrary::MarkCheckpointTime(UObject * WorldContextObject, int32 CheckpointID)
+{
+	float DeltaTime = 0.0f;
+	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		const float PrevBastTime = MyGame->GetBastCheckpointTime(CheckpointID);
+
+		MyGame->SaveCheckpointTime(CheckpointID);
+
+		if (PrevBastTime > 0)
+		{
+			const float CurrentTime = MyGame->GetCurrentCheckpointTime(CheckpointID);
+			DeltaTime = CurrentTime - PrevBastTime;
+		}
+	}
+
+	return DeltaTime;
+}
+
+bool UActionTestBlueprintLibrary::FinishRace(UObject * WorldContextObject)
+{
+	bool bHasWon = false;
+
+	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
+	if (MyGame)
+	{
+		MyGame->FinishRound();
+		bHasWon = MyGame->IsRoundWon();
+	}
+
+	return bHasWon;
+}
+
+FString UActionTestBlueprintLibrary::DescribeTime(float TimeSeconds, bool bShowSign)
+{
+	const float AbsTimeSeconds = FMath::Abs(TimeSeconds);
+	const bool bIsNegative = (TimeSeconds < 0);
+
+	const int32 TotalSeconds = FMath::TruncToInt(AbsTimeSeconds) % 3600;
+	const int32 NumMinutes = TotalSeconds / 60;
+	const int32 NumSeconds = TotalSeconds % 60;
+	
+	const int32 NUmMiliSeconds = FMath::TruncToInt(FMath::Fractional(AbsTimeSeconds) * 1000.0f);
+
+	FString TimeDesc = FString::Printf(TEXT("%s%02d:%02d.%03d"),
+		bShowSign ? (bIsNegative ? TEXT("-") : TEXT("+")) : TEXT(""),
+		NumMinutes, NumSeconds, NUmMiliSeconds);
+
+	return TimeDesc;
+}
+
+void UActionTestBlueprintLibrary::DisplayMessage(UObject * WorldContextObject, FString Message, float DisplayDuration, float PosX, float PosY, float TextScale, bool bRedBorder)
+{
+}
+
 void UActionTestBlueprintLibrary::SortHighscores(TArray<float> InTimes, TArray<FString> InNames, TArray<float>& OutTimes, TArray<FString>& OutNames, int32 MaxScores)
 {
 	//首先排序时间和玩家名称

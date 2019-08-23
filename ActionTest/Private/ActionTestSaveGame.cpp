@@ -25,3 +25,8 @@ void UActionTestSaveGame::GetRecord(float & Time, FString & Name, int32 index)
 		Name = Names[index];
 	}
 }
+
+const float UActionTestSaveGame::GetCurrentTime()
+{
+	return 0.0f;
+}

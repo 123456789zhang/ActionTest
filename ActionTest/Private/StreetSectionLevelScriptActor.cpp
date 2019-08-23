@@ -9,6 +9,10 @@
 #include "Curves/RichCurve.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "ActionTestHUD.h"
+#include "ActionTestGameMode.h"
 
 AStreetSectionLevelScriptActor::AStreetSectionLevelScriptActor()
 {
@@ -69,6 +73,13 @@ void AStreetSectionLevelScriptActor::BeginPlay()
 
 	UActionTestBlueprintLibrary::SortHighscores( Times, Names, Times, Names, 10);
 
+	if (TimelineComponent != NULL)
+	{
+		TimelineComponent->PlayFromStart();
+	}
+
+	GetWorldTimerManager().SetTimer(TimerHandle_BindingMethod, this, &AStreetSectionLevelScriptActor::BindingMethod, 0.2f, false);
+
 	Save = UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlatformerSave")),0);
 
 	if (Save == nullptr)
@@ -91,11 +102,6 @@ void AStreetSectionLevelScriptActor::BeginPlay()
 			SetArrayElem<FString>(Names, i, Name);
 		}
 	}
-
-	if (TimelineComponent != NULL)
-	{
-		TimelineComponent->PlayFromStart();
-	}
 }
 
 void AStreetSectionLevelScriptActor::Tick(float DeltaTime)
@@ -106,6 +112,14 @@ void AStreetSectionLevelScriptActor::Tick(float DeltaTime)
 	{
 		TimelineComponent->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, NULL);
 	}
+}
+
+void AStreetSectionLevelScriptActor::OnHighscoreNameAccepted(const FString & NewHighscoreName)
+{
+}
+
+void AStreetSectionLevelScriptActor::OnRoundFinished_Implementation()
+{
 }
 
 void AStreetSectionLevelScriptActor::UpdateSaveHiscores()
@@ -128,6 +142,20 @@ void AStreetSectionLevelScriptActor::TimelineFinishedCallback()
 	{
 		TimelineComponent->PlayFromStart();
 	}
+}
+
+void AStreetSectionLevelScriptActor::BindingMethod()
+{
+	APlayerController* PlayController = UGameplayStatics::GetPlayerController(this, 0);
+
+	AActionTestHUD* HUD = Cast<AActionTestHUD>(PlayController->GetHUD());
+	HUD->OnHighscoreNameAccepted.__Internal_AddDynamic(this, &AStreetSectionLevelScriptActor::OnHighscoreNameAccepted,
+		FName(TEXT("OnHighscoreNameAccepted")));
+
+	AActionTestGameMode* GameMode = Cast<AActionTestGameMode>(UGameplayStatics::GetGameMode(this));
+	GameMode->OnRoundFinished.__Internal_AddDynamic(this, &AStreetSectionLevelScriptActor::OnRoundFinished,
+		FName(TEXT("OnRoundFinished")));
+
 }
 
 

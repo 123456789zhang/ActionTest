@@ -75,3 +75,55 @@ void AActionTestGameMode::StartRound()
 void AActionTestGameMode::ModifyRoundDuration(float DeltaTime, bool bIncrease)
 {
 }
+
+float AActionTestGameMode::GetCurrentCheckpointTime(int32 CheckpointID) const
+{
+	return CurrentTimes.IsValidIndex(CheckpointID) ? CurrentTimes[CheckpointID] : -1.0f;
+}
+
+float AActionTestGameMode::GetBastCheckpointTime(int32 CheckpointID) const
+{
+	return BastTimes.IsValidIndex(CheckpointID) ? BastTimes[CheckpointID] : -1.0f;
+}
+
+void AActionTestGameMode::SaveCheckpointTime(int32 CheckpointID)
+{
+	if (CheckpointID < 0)
+	{
+		return;
+	}
+
+	//保存当前时间
+	while (CheckpointID >= CurrentTimes.Num())
+	{
+		CurrentTimes.Add(-1.0f);
+	}
+
+	CurrentTimes[CheckpointID] = GetRoundDuration();
+}
+
+void AActionTestGameMode::FinishRound()
+{
+}
+
+bool AActionTestGameMode::IsRoundWon() const
+{
+	return bRoundWasWon;
+}
+
+float AActionTestGameMode::GetRoundDuration() const
+{
+	if (IsRoundInProgress())
+	{
+		const float CurrTime = GetWorld()->GetTimeSeconds();
+		return CurrTime - RoundStartTime;
+	}
+
+	const int32 LastCheckpoint = GetNumCheckpoints() - 1;
+	return GetBastCheckpointTime(LastCheckpoint);
+}
+
+int32 AActionTestGameMode::GetNumCheckpoints() const
+{
+	return FMath::Max(CurrentTimes.Num(), BastTimes.Num());
+}

@@ -25,6 +25,12 @@ public:
 
 	virtual void Tick(float DeltaTime)override;
 
+	UFUNCTION()
+	void OnHighscoreNameAccepted(const FString& NewHighscoreName);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRoundFinished();
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -56,6 +62,9 @@ public:
 
 	UPROPERTY()
 		float CurveFloat;
+private:
+
+	FTimerHandle TimerHandle_BindingMethod;
 
 protected:
 
@@ -70,9 +79,11 @@ protected:
 
 private:
 
+	UFUNCTION()
+	void BindingMethod();
+
 	template<typename T>
 	void SetArrayElem(TArray<T> Array, int32 index, T Item);
-
 
 };
 
