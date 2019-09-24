@@ -22,13 +22,13 @@ class ACTIONTEST_API IInterfaceAPI
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual	void SetRecord(float Time, FString Name, int32 index) = 0;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual	void GetRecord(float& Time, FString& Name, int32 index) = 0;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual const float GetCurrentTime() = 0;
 
 };

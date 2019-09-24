@@ -24,6 +24,11 @@ void AActionTestPlayerCameraManager::SetCameraZoom(float ZoomAlpha)
 	CurrentZoomAlpha = FMath::Clamp(ZoomAlpha, 0.0f, 1.0f);
 }
 
+float AActionTestPlayerCameraManager::GetCameraZoom() const
+{
+	return CurrentZoomAlpha;
+}
+
 void AActionTestPlayerCameraManager::SetFixedCameraOffsetZ(float InOffset)
 {
 	FixedCameraOffsetZ = InOffset;

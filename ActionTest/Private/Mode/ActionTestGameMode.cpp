@@ -6,6 +6,8 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "PlayerPawn.h"
+#include "ActionTestCharacter.h"
+#include "TimerManager.h"
 
 AActionTestGameMode::AActionTestGameMode(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -59,6 +61,10 @@ EGameState::Type AActionTestGameMode::GetGameState() const
 
 void AActionTestGameMode::SetCanBeRestarted(bool bAllowRestart)
 {
+	if (GameState == EGameState::Finished)
+	{
+		bCanBeRestarted = bAllowRestart;
+	}
 }
 
 bool AActionTestGameMode::IsRoundInProgress() const
@@ -74,6 +80,28 @@ void AActionTestGameMode::StartRound()
 
 void AActionTestGameMode::ModifyRoundDuration(float DeltaTime, bool bIncrease)
 {
+	if (IsRoundInProgress())
+	{
+		const float PrevRoundStartTime = RoundStartTime;
+		const float Delta = FMath::Abs(DeltaTime);
+		if (bIncrease)
+		{
+			RoundStartTime -= Delta;
+		}
+		else
+		{
+			const float CurrTime = GetWorld()->GetTimeSeconds();
+			RoundStartTime += Delta;
+			RoundStartTime = FMath::Min(RoundStartTime, CurrTime);
+		}
+
+		APlayerController* PC = GEngine->GetFirstLocalPlayerController(GetWorld());
+		AActionTestHUD* HUD = PC ? Cast<AActionTestHUD>(PC->MyHUD) : NULL;
+		if (HUD)
+		{
+			HUD->NotifyRoundTimeModified(PrevRoundStartTime - RoundStartTime);
+		}
+	}
 }
 
 float AActionTestGameMode::GetCurrentCheckpointTime(int32 CheckpointID) const
@@ -81,7 +109,7 @@ float AActionTestGameMode::GetCurrentCheckpointTime(int32 CheckpointID) const
 	return CurrentTimes.IsValidIndex(CheckpointID) ? CurrentTimes[CheckpointID] : -1.0f;
 }
 
-float AActionTestGameMode::GetBastCheckpointTime(int32 CheckpointID) const
+float AActionTestGameMode::GetBestCheckpointTime(int32 CheckpointID) const
 {
 	return BastTimes.IsValidIndex(CheckpointID) ? BastTimes[CheckpointID] : -1.0f;
 }
@@ -104,6 +132,34 @@ void AActionTestGameMode::SaveCheckpointTime(int32 CheckpointID)
 
 void AActionTestGameMode::FinishRound()
 {
+	GameState = EGameState::Finished;
+
+	//确定游戏状态
+	const int32 LastCheckpointIdx = GetNumCheckpoints() - 1;
+	const float BestTime = GetBestCheckpointTime(LastCheckpointIdx);
+	bRoundWasWon = (BestTime < 0) || (GetRoundDuration() < BestTime);
+
+	//通知玩家
+	APlayerController* PC = GEngine->GetFirstLocalPlayerController(GetWorld());
+	AActionTestCharacter* Pawn = PC ? Cast<AActionTestCharacter>(PC->GetPawn()) : NULL;
+	if (Pawn)
+	{
+		Pawn->OnRoundFinished();
+	}
+
+	//更新最佳检查点时间
+	while (LastCheckpointIdx >= BastTimes.Num())
+	{
+		BastTimes.Add(-1.0f);
+	}
+
+	for (int32 i = 0; i < BastTimes.Num(); i++)
+	{
+		if ((BastTimes[i] < 0) || (BastTimes[i] > CurrentTimes[i]))
+		{
+			BastTimes[i] = CurrentTimes[i];
+		}
+	}
 }
 
 bool AActionTestGameMode::IsRoundWon() const
@@ -120,10 +176,25 @@ float AActionTestGameMode::GetRoundDuration() const
 	}
 
 	const int32 LastCheckpoint = GetNumCheckpoints() - 1;
-	return GetBastCheckpointTime(LastCheckpoint);
+	return GetBestCheckpointTime(LastCheckpoint);
 }
 
 int32 AActionTestGameMode::GetNumCheckpoints() const
 {
 	return FMath::Max(CurrentTimes.Num(), BastTimes.Num());
+}
+
+bool AActionTestGameMode::CanBeRestarted() const
+{
+	return (GameState == EGameState::Finished && bCanBeRestarted);
+}
+
+void AActionTestGameMode::TryRestartRound()
+{
+	if (CanBeRestarted())
+	{
+		PrepareRound(true);
+		GetWorldTimerManager().SetTimer(TimerHandle_StartRound,this,&AActionTestGameMode::StartRound,2.0f,false);
+		bCanBeRestarted = false;
+	}
 }

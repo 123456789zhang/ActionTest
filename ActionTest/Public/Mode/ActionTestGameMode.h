@@ -40,6 +40,9 @@ public:
 
 private:
 
+	/** 为有效管理定时器 */
+	FTimerHandle TimerHandle_StartRound;
+
 	/** 当前正在进行中 */
 	EGameState::Type GameState;
 
@@ -54,6 +57,9 @@ private:
 
 	/** 最好的检查时间 */
 	TArray<float> BastTimes;
+
+	/** 如果回合结束后可以重新开始，则为真 */
+	uint32 bCanBeRestarted : 1;
 
 public:
 
@@ -79,7 +85,7 @@ public:
 	float GetCurrentCheckpointTime(int32 CheckpointID) const;
 
 	/** 获取最好的检查点时间 */
-	float GetBastCheckpointTime(int32 CheckpointID) const;
+	float GetBestCheckpointTime(int32 CheckpointID) const;
 
 	/** 保存当前时间检查点 */
 	void SaveCheckpointTime(int32 CheckpointID);
@@ -98,5 +104,11 @@ public:
 
 	/** 获取检查点数量 */
 	int32 GetNumCheckpoints() const;
+
+	/** 如果可以重新启动，则返回 */
+	bool CanBeRestarted() const;
+
+	/** 尝试重新启动 */
+	void TryRestartRound();
 
 };

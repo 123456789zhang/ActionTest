@@ -111,4 +111,6 @@ APlayerPawn::APlayerPawn()
 
 	ClimbLedgeRootOffset = FVector(212.0f,0.0f,164.0f);
 	ClimbLedgeGrabOffsetX = 112.0f;
+
+	CameraHeightChangeThreshold = 400.0f;
 }

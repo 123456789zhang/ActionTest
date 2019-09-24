@@ -93,7 +93,7 @@ float UActionTestBlueprintLibrary::MarkCheckpointTime(UObject * WorldContextObje
 	AActionTestGameMode* MyGame = GetGameFromContextObject(WorldContextObject);
 	if (MyGame)
 	{
-		const float PrevBastTime = MyGame->GetBastCheckpointTime(CheckpointID);
+		const float PrevBastTime = MyGame->GetBestCheckpointTime(CheckpointID);
 
 		MyGame->SaveCheckpointTime(CheckpointID);
 
@@ -141,7 +141,40 @@ FString UActionTestBlueprintLibrary::DescribeTime(float TimeSeconds, bool bShowS
 
 void UActionTestBlueprintLibrary::DisplayMessage(UObject * WorldContextObject, FString Message, float DisplayDuration, float PosX, float PosY, float TextScale, bool bRedBorder)
 {
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObjectChecked(WorldContextObject));
+	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
+	if (MyHUD)
+	{
+		MyHUD->AddMessage(Message, DisplayDuration,PosX,PosY,TextScale/4, bRedBorder);
+	}
 }
+
+void UActionTestBlueprintLibrary::ShowHighscorePrompt(UObject * WorldContextObject)
+{
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GEngine->GetWorldFromContextObjectChecked(WorldContextObject));
+	AActionTestHUD* MyHUD = LocalPC ? Cast<AActionTestHUD>(LocalPC->GetHUD()) : NULL;
+	if (MyHUD)
+	{
+		MyHUD->ShowHighscorePrompt();
+	}
+}
+
+void UActionTestBlueprintLibrary::ShowPicture(UObject * WorldContextObject, UTexture2D * Picture, float FadeInTime, float ScreenCoverage, bool bKeepAspectRatio)
+{
+	UWorld* const MyWorld = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+	AActionTestGameMode* const MyGameMode = MyWorld->GetAuthGameMode<AActionTestGameMode>();
+
+	if (MyGameMode)
+	{
+		if (!MyGameMode->ActionTestPicture)
+		{
+			MyGameMode->ActionTestPicture = new FActionTestPicture(MyWorld);
+		}
+		MyGameMode->ActionTestPicture->Show(Picture, FadeInTime, ScreenCoverage, bKeepAspectRatio);
+	}
+}
+
+
 
 void UActionTestBlueprintLibrary::SortHighscores(TArray<float> InTimes, TArray<FString> InNames, TArray<float>& OutTimes, TArray<FString>& OutNames, int32 MaxScores)
 {

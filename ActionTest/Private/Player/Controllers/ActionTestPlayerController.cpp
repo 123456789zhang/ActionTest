@@ -25,7 +25,7 @@ bool AActionTestPlayerController::TryStartingGame()
 				return true;
 
 			case EGameState::Finished:
-
+				MyGame->TryRestartRound();
 				return true;
 		}
 	}

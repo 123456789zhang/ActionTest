@@ -8,7 +8,7 @@
 #include "StreetSectionLevelScriptActor.generated.h"
 
 
-class USaveGame;
+class UActionTestSaveGame;
 /**
  * 
  */
@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRoundFinished();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowHiscoresAndSave();
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -40,16 +43,19 @@ public:
 		TArray<float> Times;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USaveGame* Save;
+		UActionTestSaveGame* Save;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString CurrentName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float CurrentTiem;
+		float CurrentTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool Hidden;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bWinner;
 
 	UPROPERTY()
 		class UCurveFloat* FloatCurve;
@@ -83,12 +89,12 @@ private:
 	void BindingMethod();
 
 	template<typename T>
-	void SetArrayElem(TArray<T> Array, int32 index, T Item);
+	void SetArrayElem(TArray<T>& Array, int32 index, T Item);
 
 };
 
 template<typename T>
-void AStreetSectionLevelScriptActor::SetArrayElem(TArray<T> Array, int32 index, T Item)
+void AStreetSectionLevelScriptActor::SetArrayElem(TArray<T>& Array, int32 index, T Item)
 {
 	if (!Array.IsValidIndex(index))
 	{

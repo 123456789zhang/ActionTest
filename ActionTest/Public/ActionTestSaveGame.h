@@ -29,12 +29,12 @@ public:
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SetRecord(float Time,FString Name,int32 index) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void GetRecord(float& Time, FString& Name, int32 index)override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual const float GetCurrentTime() override;
 };

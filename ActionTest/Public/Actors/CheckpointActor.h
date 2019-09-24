@@ -26,6 +26,8 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void OnConstruction(const FTransform & Transform);
+
 	UFUNCTION()
 	virtual void SetRecord(float Time, FString Name, int32 index) override;
 
@@ -39,22 +41,22 @@ public:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 	UBoxComponent* Box;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	float DeltaTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	bool bIsItTheLastCheckPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	int32 CheckPointID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	bool bWinner;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	bool bStartEnding;
 
 };

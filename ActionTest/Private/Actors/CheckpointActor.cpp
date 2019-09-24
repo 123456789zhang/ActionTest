@@ -21,6 +21,12 @@ ACheckpointActor::ACheckpointActor()
 	Box->SetCollisionResponseToChannel(ECollisionChannel::ECC_Destructible, ECollisionResponse::ECR_Ignore);
 
 	RootComponent = Box;
+
+	DeltaTime = 0.0f;
+	bIsItTheLastCheckPoint = false;
+	CheckPointID = 0;
+	bWinner = false;
+	bStartEnding = false;
 }
 
 void ACheckpointActor::BeginPlay()
@@ -34,6 +40,16 @@ void ACheckpointActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ACheckpointActor::OnConstruction(const FTransform & Transform)
+{
+	Super::OnConstruction(Transform);
+
+	FVector RootScale3D=K2_GetRootComponent()->RelativeScale3D;
+	FVector BoxExtent = Box->GetUnscaledBoxExtent();
+	FVector NewFVector(RootScale3D.X * BoxExtent.X, RootScale3D.Y * BoxExtent.Y, RootScale3D.Z * BoxExtent.Z);
+	Box->SetBoxExtent(NewFVector,true);
 }
 
 void ACheckpointActor::SetRecord(float Time, FString Name, int32 index)

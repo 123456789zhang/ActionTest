@@ -62,6 +62,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
 		static void DisplayMessage(class UObject* WorldContextObject, FString Message, float DisplayDuration = 1.0f, float PosX = 0.5f, float PosY = 0.5f, float TextScale = 1.0f, bool bRedBorder = false);
 
+	/** 显示highscore提示,调用HighscoreNameAccepted当用户完成 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void ShowHighscorePrompt(class UObject* WorldContextObject);
+
+	/** 显示覆盖整个屏幕的指定纹理 */
+	UFUNCTION(BlueprintCallable, Category = HUD, meta = (WorldContext = "WorldContextObject"))
+		static void ShowPicture(class UObject* WorldContextObject,class UTexture2D* Picture, float FadeInTime = 0.3f, float ScreenCoverage = 1.0f, bool bKeepAspectRatio = false);
+	
 	/* 
 	 *	分数排序
 	 *

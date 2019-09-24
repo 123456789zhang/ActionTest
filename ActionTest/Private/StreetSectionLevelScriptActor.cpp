@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ActionTestHUD.h"
 #include "ActionTestGameMode.h"
+#include "Engine.h"
 
 AStreetSectionLevelScriptActor::AStreetSectionLevelScriptActor()
 {
@@ -80,11 +81,11 @@ void AStreetSectionLevelScriptActor::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_BindingMethod, this, &AStreetSectionLevelScriptActor::BindingMethod, 0.2f, false);
 
-	Save = UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlatformerSave")),0);
+	Save = Cast<UActionTestSaveGame>(UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlatformerSave")),0));
 
 	if (Save == nullptr)
 	{
-		Save = UGameplayStatics::CreateSaveGameObject(UActionTestSaveGame::StaticClass());
+		Save = Cast<UActionTestSaveGame>(UGameplayStatics::CreateSaveGameObject(UActionTestSaveGame::StaticClass()));
 
 		UpdateSaveHiscores();
 
@@ -116,10 +117,23 @@ void AStreetSectionLevelScriptActor::Tick(float DeltaTime)
 
 void AStreetSectionLevelScriptActor::OnHighscoreNameAccepted(const FString & NewHighscoreName)
 {
+	CurrentName = NewHighscoreName;
+
+	Times.Add(CurrentTime);
+	Names.Add(CurrentName);
+	UActionTestBlueprintLibrary::SortHighscores(Times, Names, Times, Names, 10);
+	UpdateSaveHiscores();
+	ShowHiscoresAndSave();
 }
 
 void AStreetSectionLevelScriptActor::OnRoundFinished_Implementation()
 {
+
+}
+
+void AStreetSectionLevelScriptActor::ShowHiscoresAndSave_Implementation() 
+{
+
 }
 
 void AStreetSectionLevelScriptActor::UpdateSaveHiscores()
